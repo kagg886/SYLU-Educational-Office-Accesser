@@ -47,7 +47,8 @@ public class ClassTable extends ArrayList<ClassTable.Info> {
             String timeEachLesson = object.getString("jcs");
             String teacher = object.getString("xm");
             String week = object.getString("zcd");
-            add(new Info(name, teacher, room, week, timeEachLesson));
+            String xqj = object.getString("xqj");
+            add(new Info(name, teacher, room, week, timeEachLesson,xqj));
         });
     }
 
@@ -64,7 +65,15 @@ public class ClassTable extends ArrayList<ClassTable.Info> {
         return rtn;
     }
 
+    public ClassTable queryClassByDay(int day) {
+        ClassTable rtn = new ClassTable();
+        rtn.addAll(this.stream().filter(info -> info.getDayInWeek() == day).toList());
+        return rtn;
+    }
+
     public static class Info {
+
+        public static Info EMPTY = new Info(null,null,null,null,null,"0");
 
         //课程:大学物理A1
         //老师:迟宝倩
@@ -77,13 +86,19 @@ public class ClassTable extends ArrayList<ClassTable.Info> {
         private final String weekEachLesson;
 
         private final String lesson;
+        private final int dayInWeek;
 
-        public Info(String name, String teacher, String room, String weekEachLesson, String lesson) {
+        public Info(String name, String teacher, String room, String weekEachLesson, String lesson,String dayInWeek) {
             this.name = name;
             this.teacher = teacher;
             this.room = room;
             this.weekEachLesson = weekEachLesson;
             this.lesson = lesson;
+            this.dayInWeek = Integer.parseInt(dayInWeek);
+        }
+
+        public int getDayInWeek() {
+            return dayInWeek;
         }
 
         public String getName() {
@@ -134,6 +149,7 @@ public class ClassTable extends ArrayList<ClassTable.Info> {
                     .add("room='" + room + "'")
                     .add("weekEachLesson='" + weekEachLesson + "'")
                     .add("lesson='" + lesson + "'")
+                    .add("dayInWeek='" + dayInWeek + "'")
                     .toString();
         }
     }

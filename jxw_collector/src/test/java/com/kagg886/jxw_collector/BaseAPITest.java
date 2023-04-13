@@ -42,18 +42,23 @@ public class BaseAPITest {
     }
 
     @Test
-    public void testClassQueryByWeek() {
+    public void testClassQueryByWeekDay() {
         SyluSession session = new SyluSession("2203050528");
         session.login(pwd);
         Schedule schedule = session.getSchedule();
         ClassTable table = schedule.queryClassByYearAndTerm("2022-2023", "2");
-        table = table.queryClassByWeek(17);
-        System.out.println(table);
-        Assertions.assertEquals(3, table.size());
+        ClassTable table0;
+        table0 = table.queryClassByWeek(17);
+        System.out.println(table0);
+        Assertions.assertEquals(3, table0.size());
 
-        table = table.queryClassByWeek(20);
-        System.out.println(table);
-        Assertions.assertEquals(0, table.size());
+        table0 = table.queryClassByWeek(20);
+        System.out.println(table0);
+        Assertions.assertEquals(0, table0.size());
+
+        table0 = table.queryClassByWeek(14).queryClassByDay(1);
+        System.out.println(table0);
+        Assertions.assertEquals(3,table0.size());
     }
 
     @Test

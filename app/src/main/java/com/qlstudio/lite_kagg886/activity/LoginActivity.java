@@ -38,7 +38,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private LinearLayout mName, mPsw;
 
-    private boolean isLogin = false;
+    private volatile boolean isLogin = false;
 
     private Handler animController = new Handler(Looper.getMainLooper()) {
         @Override
@@ -51,11 +51,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     isLogin = true;
                     // 计算出控件的高与宽
                     mWidth = mBtnLogin.getMeasuredWidth();
-                    mHeight = mBtnLogin.getMeasuredHeight();
                     // 隐藏输入框
                     mName.setVisibility(View.INVISIBLE);
                     mPsw.setVisibility(View.INVISIBLE);
-                    inputAnimator(mInputLayout, mWidth, mHeight);
+                    inputAnimator(mInputLayout, mWidth);
                     break;
                 case 1:
                     progress.setVisibility(View.GONE);
@@ -71,8 +70,29 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     ObjectAnimator animator2 = ObjectAnimator.ofFloat(mInputLayout, "scaleX", 0.5f, 1f);
                     animator2.setDuration(TIME);
                     animator2.setInterpolator(new AccelerateDecelerateInterpolator());
+                    animator2.addListener(new Animator.AnimatorListener() {
+
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            isLogin = false;
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+                    });
                     animator2.start();
-                    isLogin = false;
                     break;
             }
         }
@@ -99,36 +119,30 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                animController.sendEmptyMessage(0);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                animController.sendEmptyMessage(1);
+        if (isLogin) { //不能放进线程中判断，不然会重复启用关闭动画
+            return;
+        }
+        new Thread(() -> {
+            animController.sendEmptyMessage(0);
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
+            animController.sendEmptyMessage(1);
         }).start();
     }
 
-    private void inputAnimator(final View view, float w, float h) {
-
+    private void inputAnimator(final View view, float w) {
         AnimatorSet set = new AnimatorSet();
-
         ValueAnimator animator = ValueAnimator.ofFloat(0, w);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float value = (Float) animation.getAnimatedValue();
-                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view
-                        .getLayoutParams();
-                params.leftMargin = (int) value;
-                params.rightMargin = (int) value;
-                view.setLayoutParams(params);
-            }
+        animator.addUpdateListener(animation -> {
+            float value = (Float) animation.getAnimatedValue();
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view
+                    .getLayoutParams();
+            params.leftMargin = (int) value;
+            params.rightMargin = (int) value;
+            view.setLayoutParams(params);
         });
 
         ObjectAnimator animator2 = ObjectAnimator.ofFloat(mInputLayout,
@@ -151,9 +165,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                /**
-                 * 动画结束后，先显示加载的动画，然后再隐藏输入框
-                 */
                 progress.setVisibility(View.VISIBLE);
                 PropertyValuesHolder animator = PropertyValuesHolder.ofFloat("scaleX",
                         0.5f, 1f);
@@ -165,7 +176,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 animator3.setInterpolator(new JellyInterpolator());
                 animator3.start();
                 mInputLayout.setVisibility(View.INVISIBLE);
-
             }
 
             @Override

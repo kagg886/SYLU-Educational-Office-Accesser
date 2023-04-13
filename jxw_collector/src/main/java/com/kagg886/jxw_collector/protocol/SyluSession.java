@@ -29,12 +29,23 @@ public class SyluSession {
 
     private static final String base = "https://jxw.sylu.edu.cn";
 
-    private final String user;//用户名
+    private String user;//用户名
 
     private JSONObject rsaSession; //获取RSA信息
 
     public SyluSession(String user) {
         client = new HttpClient();
+        this.user = user;
+    }
+
+    public SyluSession() {
+        client = new HttpClient();
+    }
+
+    public void setUser(String user) {
+        if (this.user != null) {
+            throw new IllegalStateException("已初始化的用户禁止调用此方法");
+        }
         this.user = user;
     }
 
@@ -45,7 +56,7 @@ public class SyluSession {
     private void setRSA() {
         client.url(compile("/xtgl/login_getPublicKey.html?time=",
                 new Date().getTime(),
-                "&_=",new Date().getTime()));
+                "&_=", new Date().getTime()));
         Connection.Response resp = client.get();
         client.header("Cookie",resp.header("Set-Cookie"))
                 .header("Content-Type","application/x-www-form-urlencoded");

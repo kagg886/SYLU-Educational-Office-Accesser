@@ -14,5 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "掌上沈理青春版"
 include ':app'
-include 'jxw_collector'
+include ':jxw_collector'
 

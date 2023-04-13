@@ -5,11 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.internal.RSA;
+import com.kagg886.jxw_collector.protocol.beans.Schedule;
+import com.kagg886.jxw_collector.protocol.beans.UserInfo;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -37,6 +38,10 @@ public class SyluSession {
         this.user = user;
     }
 
+    public HttpClient getClient() {
+        return client;
+    }
+
     private void setRSA() {
         client.url(compile("/xtgl/login_getPublicKey.html?time=",
                 new Date().getTime(),
@@ -46,6 +51,11 @@ public class SyluSession {
                 .header("Content-Type","application/x-www-form-urlencoded");
         this.rsaSession = JSON.parseObject(resp.body());
     }
+
+    public String getStuCode() {
+        return user;
+    }
+
 
     public void login(String pwd) {
         setRSA();
@@ -72,9 +82,49 @@ public class SyluSession {
         return true;
     }
 
-    private String compile(Object... p) {
+    public String compile(Object... p) {
         StringBuilder builder = new StringBuilder(base);
         Arrays.stream(p).forEach(builder::append);
         return builder.toString();
+    }
+
+    public UserInfo getUserInfo() {
+        assertLogin();
+        client.url(compile("/xtgl/index_cxYhxxIndex.html?xt=jw&localeKey=zh_CN&_=",new Date().getTime(),"&gnmkdm=index&su=",user));
+        Connection.Response resp = client.get();
+        Document document = Jsoup.parse(resp.body());
+        String avt = document.getElementsByTag("img").attr("src");
+        String name = document.getElementsByTag("h4").text();
+        String clazz = document.getElementsByTag("p").text();
+        return new UserInfo(compile(avt),name,clazz);
+    }
+
+    public Schedule getSchedule() {
+        return new Schedule(this);
+    }
+
+
+
+    //        conn.url(base + "/kbcx/xskbcx_cxXsgrkb.html?gnmkdm=N2151&su=" + user)
+//                .data("xnm", "2022").data("xqm", "12")
+//                .data("kzlx", "ck").data("xsdm", "");
+//
+//        resp = conn.execute();
+//
+//        JSONArray array = JSON.parseObject(resp.body()).getJSONArray("kbList");
+//        array.forEach((obj) -> {
+//            JSONObject object = ((JSONObject) obj);
+//            String room = object.getString("cdmc");
+//            String name = object.getString("kcmc");
+//            String timeEachLesson = object.getString("jcs");
+//            String teacher = object.getString("xm");
+//            String week = object.getString("zcd");
+//            System.out.printf("课程:%s\n老师:%s\n教室:%s\n周数:%s\n节数:%s\n-----------------\n", name, teacher, room, week, timeEachLesson);
+//        });
+
+    public void assertLogin() {
+        if (!isLogin()) {
+            throw new OfflineException("登录状态为未登录或踢下线");
+        }
     }
 }

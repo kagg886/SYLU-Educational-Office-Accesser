@@ -16,7 +16,7 @@ import java.io.*;
  * @version: 1.0
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class APITest {
+public class LoginTest {
     private static final String pwd;
     static {
         try {

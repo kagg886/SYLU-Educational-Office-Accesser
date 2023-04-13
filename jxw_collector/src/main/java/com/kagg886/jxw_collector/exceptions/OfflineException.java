@@ -9,7 +9,7 @@ package com.kagg886.jxw_collector.exceptions;
  * @date: 2023/4/13 13:57
  * @version: 1.0
  */
-public abstract class OfflineException extends RuntimeException {
+public class OfflineException extends RuntimeException {
     public OfflineException(String s) {
         super(s);
     }

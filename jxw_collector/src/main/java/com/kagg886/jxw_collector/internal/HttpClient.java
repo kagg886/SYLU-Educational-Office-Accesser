@@ -56,7 +56,7 @@ public class HttpClient {
 
     public HttpClient() {
         connection = Jsoup.newSession();
-        connection.ignoreHttpErrors(true).ignoreContentType(true).timeout(30000);
+        connection.ignoreHttpErrors(true).ignoreContentType(true).timeout(10000);
     }
 
     public HttpClient clearData() {

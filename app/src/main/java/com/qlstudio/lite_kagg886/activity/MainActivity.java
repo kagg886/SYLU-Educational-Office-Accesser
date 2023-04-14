@@ -1,5 +1,6 @@
 package com.qlstudio.lite_kagg886.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.*;
@@ -13,6 +14,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
+import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.kagg886.jxw_collector.protocol.beans.UserInfo;
 import com.qlstudio.lite_kagg886.GlobalApplication;
@@ -23,6 +25,29 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
+
+    private Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            switch (msg.what) {
+                case 0:
+                    NavigationView navigationView = binding.navView;
+                    ImageView img = navigationView.findViewById(R.id.nav_header_img);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        img.setImageBitmap(msg.getData().getParcelable("img", Bitmap.class));
+                    } else {
+                        img.setImageBitmap(msg.getData().getParcelable("img"));
+                    }
+                    TextView name = navigationView.findViewById(R.id.nav_header_title);
+                    name.setText(msg.getData().getString("userName"));
+                    TextView college = navigationView.findViewById(R.id.nav_header_subtitle);
+                    college.setText(msg.getData().getString("college"));
+                    break;
+                case 1:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,41 +61,28 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
 
-        Handler handler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                switch (msg.what) {
-                    case 0:
-                        ImageView img = navigationView.findViewById(R.id.nav_header_img);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            img.setImageBitmap(msg.getData().getParcelable("img", Bitmap.class));
-                        } else {
-                            img.setImageBitmap(msg.getData().getParcelable("img"));
-                        }
-                        TextView name = navigationView.findViewById(R.id.nav_header_title);
-                        name.setText(msg.getData().getString("userName"));
-                        TextView college = navigationView.findViewById(R.id.nav_header_subtitle);
-                        college.setText(msg.getData().getString("college"));
-                        break;
-                    case 1:
-                        break;
-                }
-            }
-        };
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SyluSession session = GlobalApplication.getApplicationNoStatic().getSession();
-                UserInfo info = session.getUserInfo();
-                //用户信息
-                Message message = new Message();
-                message.what = 0;
-                message.getData().putParcelable("img", BitmapFactory.decodeStream(session.getClient().url(info.getAvatar()).get().bodyStream()));
-                message.getData().putString("userName", info.getName());
-                message.getData().putString("college", info.getCollege());
-                handler.sendMessage(message);
-            }
+        new Thread(() -> {
+            SyluSession session = GlobalApplication.getApplicationNoStatic().getSession();
+            Exception out = null;
+            UserInfo info;
+            do {
+                try {
+                    info = session.getUserInfo();
+                    Message message = new Message();
+                    message.what = 0;
+                    message.getData().putParcelable("img", BitmapFactory.decodeStream(session.getClient().url(info.getAvatar()).get().bodyStream()));
+                    message.getData().putString("userName", info.getName());
+                    message.getData().putString("college", info.getCollege());
+                    handler.sendMessage(message);
+                } catch (Exception e) {
+                    if (e instanceof OfflineException) {
+                        throw e;
+                    }
+                    out = e;
+                }
+            } while (out != null);
+            //用户信息
         }).start();
 
 
@@ -86,6 +98,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+
+        //在onCreate里navView并未初始化，所以只能放在这
+        binding.navView.findViewById(R.id.btn_exit).setOnClickListener((view) -> {
+            GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(GlobalApplication.getApplicationNoStatic().getSession().getStuCode()));
+            GlobalApplication.getApplicationNoStatic().getPreferences().edit().putString("pwd", "").apply();
+            Intent p = new Intent(this, LoginActivity.class);
+            startActivity(p);
+            finish();
+        });
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }

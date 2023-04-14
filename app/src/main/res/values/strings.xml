@@ -24,8 +24,8 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_home">课程表</string>
+    <string name="menu_gallery">考试信息</string>
+    <string name="menu_slideshow">关于</string>
     <string name="login_error">提示验证码错误请重启程序</string>
 </resources>

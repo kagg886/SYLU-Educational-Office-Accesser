@@ -122,25 +122,6 @@ public class SyluSession {
         return new Schedule(this);
     }
 
-
-
-    //        conn.url(base + "/kbcx/xskbcx_cxXsgrkb.html?gnmkdm=N2151&su=" + user)
-//                .data("xnm", "2022").data("xqm", "12")
-//                .data("kzlx", "ck").data("xsdm", "");
-//
-//        resp = conn.execute();
-//
-//        JSONArray array = JSON.parseObject(resp.body()).getJSONArray("kbList");
-//        array.forEach((obj) -> {
-//            JSONObject object = ((JSONObject) obj);
-//            String room = object.getString("cdmc");
-//            String name = object.getString("kcmc");
-//            String timeEachLesson = object.getString("jcs");
-//            String teacher = object.getString("xm");
-//            String week = object.getString("zcd");
-//            System.out.printf("课程:%s\n老师:%s\n教室:%s\n周数:%s\n节数:%s\n-----------------\n", name, teacher, room, week, timeEachLesson);
-//        });
-
     public void assertLogin() {
         if (!isLogin()) {
             throw new OfflineException("登录状态为未登录或踢下线");

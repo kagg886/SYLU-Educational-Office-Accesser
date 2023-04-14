@@ -10,7 +10,6 @@ import org.jsoup.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.function.Predicate;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -21,7 +20,7 @@ import java.util.function.Predicate;
  * @date: 2023/4/13 15:58
  * @version: 1.0
  */
-public class ClassTable extends ArrayList<ClassTable.Info> {
+public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
 
     public ClassTable() {
 
@@ -48,14 +47,14 @@ public class ClassTable extends ArrayList<ClassTable.Info> {
             String teacher = object.getString("xm");
             String week = object.getString("zcd");
             String xqj = object.getString("xqj");
-            add(new Info(name, teacher, room, week, timeEachLesson,xqj));
+            add(new ClassUnit(name, teacher, room, week, timeEachLesson, xqj));
         });
     }
 
     public ClassTable queryClassByWeek(int week) {
         ClassTable rtn = new ClassTable();
-        rtn.addAll(this.stream().filter(info -> {
-            for (int[] weekRange : info.getWeekAsMinMax()) {
+        rtn.addAll(this.stream().filter(classUnit -> {
+            for (int[] weekRange : classUnit.getWeekAsMinMax()) {
                 if (week >= weekRange[0] && week <= weekRange[1]) {
                     return true;
                 }
@@ -67,13 +66,13 @@ public class ClassTable extends ArrayList<ClassTable.Info> {
 
     public ClassTable queryClassByDay(int day) {
         ClassTable rtn = new ClassTable();
-        rtn.addAll(this.stream().filter(info -> info.getDayInWeek() == day).toList());
+        rtn.addAll(this.stream().filter(classUnit -> classUnit.getDayInWeek() == day).toList());
         return rtn;
     }
 
-    public static class Info {
+    public static class ClassUnit {
 
-        public static Info EMPTY = new Info(null,null,null,null,null,"0");
+        public static ClassUnit EMPTY = new ClassUnit(null, null, null, null, null, "0");
 
         //课程:大学物理A1
         //老师:迟宝倩
@@ -88,7 +87,7 @@ public class ClassTable extends ArrayList<ClassTable.Info> {
         private final String lesson;
         private final int dayInWeek;
 
-        public Info(String name, String teacher, String room, String weekEachLesson, String lesson,String dayInWeek) {
+        private ClassUnit(String name, String teacher, String room, String weekEachLesson, String lesson, String dayInWeek) {
             this.name = name;
             this.teacher = teacher;
             this.room = room;
@@ -143,7 +142,7 @@ public class ClassTable extends ArrayList<ClassTable.Info> {
 
         @Override
         public String toString() {
-            return new StringJoiner(", ", Info.class.getSimpleName() + "[", "]")
+            return new StringJoiner(", ", ClassUnit.class.getSimpleName() + "[", "]")
                     .add("name='" + name + "'")
                     .add("teacher='" + teacher + "'")
                     .add("room='" + room + "'")

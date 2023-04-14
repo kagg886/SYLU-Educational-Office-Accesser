@@ -42,6 +42,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.4.1'
     implementation 'androidx.navigation:navigation-ui:2.4.1'
 
+    implementation 'io.github.medyo:android-about-page:2.0.0' //关于页面库
+
 
     implementation "com.alibaba:fastjson:1.2.76"
 

@@ -8,9 +8,7 @@ import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.kagg886.jxw_collector.protocol.beans.abs.YearSemesterSelectable;
 import org.jsoup.Connection;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -30,15 +28,15 @@ public class ExamResult extends YearSemesterSelectable {
     public List<ExamInfo> queryResultByYearAndTerm(String year, String term) {
         SyluSession session = getSession();
         session.assertLogin();
-        HttpClient client = session.getClient().url(session.compile("/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=N305005&su=" + session.getStuCode()))
-                .data("xnm:", getYears().get(year))
-                .data("xqm", getYears().get(term))
+        HttpClient client = session.getClient().clearData().url(session.compile("/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=sssss&su=" + session.getStuCode()))
+                .data("xnm", Objects.requireNonNull(getYears().getOrDefault(year, null)))
+                .data("xqm", Objects.requireNonNull(getTeamVal().getOrDefault(term, null)))
                 .data("_search", "false")
                 .data("nd", String.valueOf(new Date().getTime()))
                 .data("queryModel.showCount", " 15")
                 .data("queryModel.currentPage", " 1")
-                .data("queryModel.sortName:", "")
-                .data("queryModel.sortOrder:", "asc")
+                .data("queryModel.sortName", "")
+                .data("queryModel.sortOrder", "asc")
                 .data("time", "2");
         Connection.Response resp = client.post();
         JSONArray array = JSON.parseObject(resp.body()).getJSONArray("items");
@@ -105,6 +103,18 @@ public class ExamResult extends YearSemesterSelectable {
 
         public String getAbsoluteScore() {
             return absoluteScore;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", ExamInfo.class.getSimpleName() + "[", "]")
+                    .add("gradePoint='" + gradePoint + "'")
+                    .add("credit='" + credit + "'")
+                    .add("gpTimesCr='" + gpTimesCr + "'")
+                    .add("detailsID='" + detailsID + "'")
+                    .add("relate='" + relate + "'")
+                    .add("absoluteScore='" + absoluteScore + "'")
+                    .toString();
         }
     }
 }

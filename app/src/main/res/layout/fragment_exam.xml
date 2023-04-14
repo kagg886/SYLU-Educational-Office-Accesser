@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   android:orientation="vertical"
+                                                   android:gravity="fill_vertical"
+                                                   android:layout_height="match_parent">
+
+    <!--    布局为LinearLayout，以便可以设置layout_weight；-->
+    <!--    设置LinearLayout的android:weightSum的值为1；-->
+    <!--    将Button的layout_width设置为0dp;-->
+    <!--    将Button的layout_weight的值设置为0.5， 即上面的android:weightSum的一半。-->
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:weightSum="1" app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+                  android:id="@+id/linearLayout">
+
+        <LinearLayout android:layout_width="0dp"
+                      android:gravity="center"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="0.5">
+
+            <TextView
+                    android:text="@string/exam_year"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fragment_exam_chooseYear"
+                    android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:gravity="center|right"
+                      android:layout_weight="0.5">
+
+            <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fragment_exam_chooseTerm"
+                    android:layout_weight="1"/>
+
+            <TextView
+                    android:text="@string/exam_term"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fragment_exam_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

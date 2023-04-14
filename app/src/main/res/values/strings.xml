@@ -28,4 +28,6 @@
     <string name="menu_gallery">考试信息</string>
     <string name="menu_slideshow">关于</string>
     <string name="login_error">提示验证码错误请重启程序</string>
+    <string name="exam_year">学年</string>
+    <string name="exam_term">学期</string>
 </resources>

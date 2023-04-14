@@ -24,7 +24,7 @@ public class HttpClient {
     private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(15); //异步线程池
 
 
-    public Connection.Response get() {
+    public synchronized Connection.Response get() {
         try {
             return connection.method(Connection.Method.GET).execute();
         } catch (IOException e) {
@@ -32,7 +32,7 @@ public class HttpClient {
         }
     }
 
-    public Connection.Response post() {
+    public synchronized Connection.Response post() {
         try {
             return connection.method(Connection.Method.POST).execute();
         } catch (IOException e) {

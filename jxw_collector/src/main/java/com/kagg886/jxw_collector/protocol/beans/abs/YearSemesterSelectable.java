@@ -35,8 +35,9 @@ public abstract class YearSemesterSelectable {
                 .get();
         Document document = Jsoup.parse(resp.body());
         for (Element e : Objects.requireNonNull(document.getElementById("xnm")).getElementsByTag("option")) {
-            if (!e.attr("selected").equals("")) {
-                defaultTeamVal = e.text();
+
+            if (e.attr("selected").equals("selected")) {
+                defaultYears = e.text();
             }
             years.put(e.text(), e.attr("value"));
         }

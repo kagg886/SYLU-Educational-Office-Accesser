@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/mobile_navigation"
             app:startDestination="@+id/nav_schedule">
 
     <fragment
             android:id="@+id/nav_schedule"
             android:name="com.qlstudio.lite_kagg886.fragment.AboutFragment"
-            android:label="@string/menu_home"
-            tools:layout="@layout/fragment_about"/>
+            android:label="@string/menu_home"/>
 
     <fragment
             android:id="@+id/nav_exam_info"
-            android:name="com.qlstudio.lite_kagg886.fragment.AboutFragment"
-            android:label="@string/menu_gallery"
-            tools:layout="@layout/fragment_about"/>
+            android:name="com.qlstudio.lite_kagg886.fragment.ExamFragment"
+            android:label="@string/menu_gallery"/>
 
     <fragment
             android:id="@+id/nav_about"
             android:name="com.qlstudio.lite_kagg886.fragment.AboutFragment"
-            android:label="@string/menu_slideshow"
-            tools:layout="@layout/fragment_about"/>
+            android:label="@string/menu_slideshow"/>
 </navigation>

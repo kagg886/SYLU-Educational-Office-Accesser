@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.internal.RSA;
+import com.kagg886.jxw_collector.protocol.beans.ExamResult;
 import com.kagg886.jxw_collector.protocol.beans.Schedule;
 import com.kagg886.jxw_collector.protocol.beans.UserInfo;
 import org.jsoup.Connection;
@@ -109,13 +110,17 @@ public class SyluSession {
 
     public UserInfo getUserInfo() {
         assertLogin();
-        client.url(compile("/xtgl/index_cxYhxxIndex.html?xt=jw&localeKey=zh_CN&_=",new Date().getTime(),"&gnmkdm=index&su=",user));
+        client.url(compile("/xtgl/index_cxYhxxIndex.html?xt=jw&localeKey=zh_CN&_=", new Date().getTime(), "&gnmkdm=index&su=", user));
         Connection.Response resp = client.get();
         Document document = Jsoup.parse(resp.body());
         String avt = document.getElementsByTag("img").attr("src");
         String name = document.getElementsByTag("h4").text();
         String clazz = document.getElementsByTag("p").text();
-        return new UserInfo(compile(avt),name,clazz);
+        return new UserInfo(compile(avt), name, clazz);
+    }
+
+    public ExamResult getExamResult() {
+        return new ExamResult(this);
     }
 
     public Schedule getSchedule() {

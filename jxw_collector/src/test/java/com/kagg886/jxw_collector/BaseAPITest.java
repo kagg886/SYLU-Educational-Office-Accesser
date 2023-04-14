@@ -3,6 +3,7 @@ package com.kagg886.jxw_collector;
 import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.kagg886.jxw_collector.protocol.beans.ClassTable;
+import com.kagg886.jxw_collector.protocol.beans.ExamResult;
 import com.kagg886.jxw_collector.protocol.beans.Schedule;
 import com.kagg886.jxw_collector.protocol.beans.UserInfo;
 import org.junit.jupiter.api.Assertions;
@@ -39,6 +40,19 @@ public class BaseAPITest {
         Schedule schedule = session.getSchedule();
         ClassTable table = schedule.queryClassByYearAndTerm("2022-2023", "2");
         System.out.println(table);
+    }
+
+    @Test
+    public void testExamResult() {
+        SyluSession session = new SyluSession("2203050528");
+        session.login(pwd);
+        ExamResult result = session.getExamResult();
+
+        System.out.println(result.getDefaultTeamVal());
+        System.out.println(result.getDefaultYears());
+
+        result.queryResultByYearAndTerm(result.getDefaultYears(), result.getDefaultTeamVal())
+                .forEach(System.out::println);
     }
 
     @Test

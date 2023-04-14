@@ -38,6 +38,14 @@ public class SyluSession {
         this.user = user;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SyluSession)) {
+            return false;
+        }
+        return ((SyluSession) obj).user.equals(user);
+    }
+
     public SyluSession() {
         client = new HttpClient();
     }

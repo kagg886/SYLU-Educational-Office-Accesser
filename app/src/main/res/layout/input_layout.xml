@@ -25,12 +25,13 @@
                     android:src="@drawable/paw_code"/>
 
             <EditText
+                    android:id="@+id/login_user"
                     android:textColor="@color/black"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dip"
                     android:background="#00000000"
-                    android:hint="账号/用户名/邮箱"
+                    android:hint="学号"
                     android:padding="5dip"
                     android:textSize="16sp"/>
         </LinearLayout>
@@ -55,6 +56,7 @@
                     android:src="@drawable/paw_left"/>
 
             <EditText
+                    android:id="@+id/login_pwd"
                     android:textColor="@color/black"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

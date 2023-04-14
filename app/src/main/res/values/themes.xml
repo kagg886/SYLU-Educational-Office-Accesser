@@ -14,4 +14,10 @@
 
         <!-- Customize your theme here. -->
     </style>
+    <style name="Theme.掌上沈理青春版.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.掌上沈理青春版.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="Theme.掌上沈理青春版.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 </resources>

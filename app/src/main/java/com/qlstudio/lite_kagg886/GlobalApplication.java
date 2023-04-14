@@ -48,6 +48,10 @@ public class GlobalApplication extends Application {
         return session;
     }
 
+    public void setSession(SyluSession session) {
+        this.session = session;
+    }
+
     public SharedPreferences getPreferences() {
         return preferences;
     }
@@ -57,5 +61,8 @@ public class GlobalApplication extends Application {
         super.onCreate();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         session = new SyluSession();
+        if (preferences.getString("user", null) != null) {
+            session.setUser(preferences.getString("user", null));
+        }
     }
 }

@@ -2,18 +2,24 @@ package com.qlstudio.lite_kagg886.activity;
 
 import android.animation.*;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import com.kagg886.jxw_collector.protocol.SyluSession;
+import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
 
 /**
@@ -34,9 +40,11 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private View mInputLayout;
 
-    private float mWidth, mHeight;
-
     private LinearLayout mName, mPsw;
+
+    private EditText userName, pwd;
+
+    private GlobalApplication application;
 
     private volatile boolean isLogin = false;
 
@@ -50,7 +58,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     }
                     isLogin = true;
                     // 计算出控件的高与宽
-                    mWidth = mBtnLogin.getMeasuredWidth();
+                    float mWidth = mBtnLogin.getMeasuredWidth();
                     // 隐藏输入框
                     mName.setVisibility(View.INVISIBLE);
                     mPsw.setVisibility(View.INVISIBLE);
@@ -104,6 +112,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
 
+        application = GlobalApplication.getApplicationNoStatic();
+
         initView();
     }
 
@@ -114,6 +124,20 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         mName = findViewById(R.id.input_layout_name);
         mPsw = findViewById(R.id.input_layout_psw);
 
+        userName = findViewById(R.id.login_user);
+        pwd = findViewById(R.id.login_pwd);
+
+        String user = GlobalApplication.getApplicationNoStatic().getSession().getStuCode();
+        if (!TextUtils.isEmpty(user)) {
+            userName.setText(user);
+        }
+
+        String pwd = GlobalApplication.getApplicationNoStatic().getPreferences().getString("pwd", null);
+        if (!TextUtils.isEmpty(pwd)) {
+            this.pwd.setText(pwd);
+            onClick(null);
+        }
+
         mBtnLogin.setOnClickListener(this);
     }
 
@@ -122,12 +146,26 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         if (isLogin) { //不能放进线程中判断，不然会重复启用关闭动画
             return;
         }
+        application.getPreferences().edit()
+                .putString("user", userName.getEditableText().toString())
+                .putString("pwd", pwd.getEditableText().toString()).apply();
+        if (!userName.getEditableText().toString().equals(application.getSession().getStuCode())) {
+            application.setSession(new SyluSession(userName.getEditableText().toString()));
+        }
         new Thread(() -> {
             animController.sendEmptyMessage(0);
             try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                application.getSession().login(pwd.getText().toString());
+                Intent i = new Intent(this, MainActivity.class);
+                startActivity(i);
+                finish();
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("登陆失败");
+                    builder.setMessage(e.getMessage());
+                    builder.create().show();
+                });
             }
             animController.sendEmptyMessage(1);
         }).start();

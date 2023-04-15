@@ -4,7 +4,9 @@ import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import org.junit.jupiter.api.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -30,7 +32,7 @@ public class LoginTest {
     @Order(1)
     public void doLoginTestSuccess() throws Exception {
         SyluSession session = new SyluSession("2203050528");
-        session.login(pwd);
+        session.loginByPwd(pwd);
     }
 
     @Test
@@ -38,7 +40,7 @@ public class LoginTest {
     public void doLoginTestFailed() {
         SyluSession session = new SyluSession("2203050528");
         Assertions.assertThrows(OfflineException.LoginFailed.class,() -> {
-            session.login("12345678");
+            session.loginByPwd("12345678");
         });
     }
 
@@ -46,11 +48,21 @@ public class LoginTest {
     @Order(3)
     public void isLoginTest() {
         SyluSession session = new SyluSession("2203050528");
-        Assertions.assertThrows(OfflineException.LoginFailed.class,() -> {
-            session.login("12345678");
+        Assertions.assertThrows(OfflineException.LoginFailed.class, () -> {
+            session.loginByPwd("12345678");
         });
         Assertions.assertFalse(session.isLogin());
-        session.login(pwd);
+        session.loginByPwd(pwd);
         Assertions.assertTrue(session.isLogin());
+    }
+
+    @Test
+    @Order(4)
+    public void testLoginByCookie() {
+        SyluSession session = new SyluSession("2203050528");
+        Assertions.assertDoesNotThrow(() -> {
+            session.loginByCookie("JSESSIONID=8AB76F0E7C772AA7D68384C98D5D61A1");
+        });
+        System.out.println(session.getUserInfo().toString());
     }
 }

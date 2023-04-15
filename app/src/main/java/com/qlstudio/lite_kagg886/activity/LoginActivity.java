@@ -155,7 +155,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         new Thread(() -> {
             animController.sendEmptyMessage(0);
             try {
-                application.getSession().login(pwd.getText().toString());
+                application.getSession().loginByPwd(pwd.getText().toString());
                 Intent i = new Intent(this, MainActivity.class);
                 startActivity(i);
                 finish();

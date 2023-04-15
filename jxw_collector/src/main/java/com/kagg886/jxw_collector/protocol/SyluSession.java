@@ -62,13 +62,13 @@ public class SyluSession {
         return client;
     }
 
-    private void setRSA() {
+    private void initRSAClient() {
         client.url(compile("/xtgl/login_getPublicKey.html?time=",
                 new Date().getTime(),
                 "&_=", new Date().getTime()));
         Connection.Response resp = client.get();
-        client.header("Cookie",resp.header("Set-Cookie"))
-                .header("Content-Type","application/x-www-form-urlencoded");
+        client.header("Cookie", resp.header("Set-Cookie"))
+                .header("Content-Type", "application/x-www-form-urlencoded");
         this.rsaSession = JSON.parseObject(resp.body());
     }
 
@@ -77,10 +77,10 @@ public class SyluSession {
     }
 
 
-    public void login(String pwd) {
-        setRSA();
-        client.url(compile("/xtgl/login_slogin.html?time=",new Date().getTime()))
-                .data("yhm",user).data("mm",RSA.getInstance().encrypt(rsaSession,pwd));
+    public void loginByPwd(String pwd) {
+        initRSAClient();
+        client.url(compile("/xtgl/login_slogin.html?time=", new Date().getTime()))
+                .data("yhm", user).data("mm", RSA.getInstance().encrypt(rsaSession, pwd));
 
         Connection.Response resp = client.post();
 
@@ -88,6 +88,11 @@ public class SyluSession {
         if (test != null) {
             throw new OfflineException.LoginFailed("登陆失败:" + test.text());
         }
+    }
+
+    public void loginByCookie(String cookie) {
+        client.header("Cookie", cookie);
+        assertLogin();
     }
 
     public boolean isLogin() {

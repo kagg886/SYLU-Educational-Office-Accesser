@@ -37,7 +37,7 @@ public class BaseAPITest {
     @Test
     public void testClassTableGet() {
         SyluSession session = new SyluSession("2203050528");
-        session.login(pwd);
+        session.loginByPwd(pwd);
         Schedule schedule = session.getSchedule();
         ClassTable table = schedule.queryClassByYearAndTerm("2022-2023", "2");
         System.out.println(table);
@@ -46,7 +46,7 @@ public class BaseAPITest {
     @Test
     public void testExamResult() {
         SyluSession session = new SyluSession("2203050528");
-        session.login(pwd);
+        session.loginByPwd(pwd);
         ExamResult result = session.getExamResult();
 
         System.out.println(result.getDefaultTeamVal());
@@ -59,7 +59,7 @@ public class BaseAPITest {
     @Test
     public void testExamDetails() {
         SyluSession session = new SyluSession("2203050528");
-        session.login(pwd);
+        session.loginByPwd(pwd);
         ExamResult result = session.getExamResult();
 
         ExamResult.ExamInfo info = result.queryResultByYearAndTerm(result.getDefaultYears(), result.getDefaultTeamVal()).get(0);
@@ -75,7 +75,7 @@ public class BaseAPITest {
     @Test
     public void testClassQueryByWeekDay() {
         SyluSession session = new SyluSession("2203050528");
-        session.login(pwd);
+        session.loginByPwd(pwd);
         Schedule schedule = session.getSchedule();
         ClassTable table = schedule.queryClassByYearAndTerm("2022-2023", "2");
         ClassTable table0;
@@ -100,7 +100,7 @@ public class BaseAPITest {
             System.out.println(info);
         });
 
-        session.login(pwd);
+        session.loginByPwd(pwd);
         System.out.println(session.getUserInfo().toString());
     }
 }

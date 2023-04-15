@@ -44,18 +44,41 @@ public class ExamResult extends YearSemesterSelectable {
         List<ExamInfo> infos = new ArrayList<>();
         array.forEach((s) -> {
             JSONObject o = (JSONObject) s;
+            String name = o.getString("kcmc");
+            String teacher = o.getString("tjrxm");
             String credit = o.getString("xf");
             String gradePoint = o.getString("jd");
             String crTimesGp = o.getString("xfjd");
             String detailsID = o.getString("jxb_id");
             String absoluteScore = o.getString("bfzcj");
             String relateScore = o.getString("cj");
-            infos.add(new ExamInfo(gradePoint, credit, crTimesGp, detailsID, relateScore, absoluteScore));
+
+            int ksxzdm = Integer.parseInt(o.getString("ksxzdm"));
+            infos.add(new ExamInfo(name,
+                    teacher,
+                    gradePoint,
+                    credit,
+                    crTimesGp,
+                    detailsID,
+                    relateScore,
+                    absoluteScore,
+                    ksxzdm));
         });
         return infos;
     }
 
+    public enum Status {
+        SUCCESS, //考试一遍过
+        FUCK_TEACHER, //老师不捞我，呜呜呜
+        SUCCESS_RE //重修或补考成功
+    }
+
     public static class ExamInfo {
+
+        private final String name; //课程名
+
+
+        private final String teacher; //老师
 
         private final String gradePoint; //绩点
         private final String credit; //学分
@@ -66,19 +89,48 @@ public class ExamResult extends YearSemesterSelectable {
 
         private final String relate; //评价分数
 
-        private final String absoluteScore; //绝对分数，低于60为挂科
+        private final Double absoluteScore; //绝对分数，低于60为挂科
 
-        public ExamInfo(String gradePoint, String credit, String gpTimesCr, String detailsID, String relate, String absoluteScore) {
+        private final int ksxzdm; //判断重修或补考需要的凭证
+
+
+        public ExamInfo(String name, String teacher, String gradePoint, String credit, String gpTimesCr, String detailsID, String relate, String absoluteScore, int ksxzdm) {
+            this.name = name;
+            this.teacher = teacher;
             this.gradePoint = gradePoint;
             this.credit = credit;
             this.gpTimesCr = gpTimesCr;
             this.detailsID = detailsID;
             this.relate = relate;
-            this.absoluteScore = absoluteScore;
+            this.absoluteScore = Double.parseDouble(absoluteScore);
+            this.ksxzdm = ksxzdm;
         }
 
-        public boolean isFuckTeacher() {
-            return Double.parseDouble(absoluteScore) < 60;
+        /**
+         * @param :
+         * @return Status
+         * @author kagg886
+         * @description 获取本次考试的状态
+         * @date 2023/04/15 08:58
+         * @see <a href="https://jxw.sylu.edu.cn/js/comp/jwglxt/cjgl/cjcx/cxDgXscj.js?ver=27989871">186行</a>
+         */
+
+        //if (rowData.bfzcj >= 60 && (rowData.ksxzdm == "11" || rowData.ksxzdm == "16" || rowData.ksxzdm == "17")) {
+        //     $("#tabGrid tr[id='" + ids[ii] + "']").attr("style", "color:blue");
+        //}
+        public Status getStatus() {
+            if (Double.compare(absoluteScore, 60) == -1) {
+                return Status.FUCK_TEACHER;
+            } else {
+                if (ksxzdm == 11 || ksxzdm == 16 || ksxzdm == 17) {
+                    return Status.SUCCESS_RE;
+                }
+            }
+            return Status.SUCCESS;
+        }
+
+        public int getKsxzdm() {
+            return ksxzdm;
         }
 
         public String getGradePoint() {
@@ -101,19 +153,30 @@ public class ExamResult extends YearSemesterSelectable {
             return relate;
         }
 
-        public String getAbsoluteScore() {
+        public Double getAbsoluteScore() {
             return absoluteScore;
+        }
+
+        public String getTeacher() {
+            return teacher;
+        }
+
+        public String getName() {
+            return name;
         }
 
         @Override
         public String toString() {
             return new StringJoiner(", ", ExamInfo.class.getSimpleName() + "[", "]")
+                    .add("name='" + name + "'")
+                    .add("teacher='" + teacher + "'")
                     .add("gradePoint='" + gradePoint + "'")
                     .add("credit='" + credit + "'")
                     .add("gpTimesCr='" + gpTimesCr + "'")
                     .add("detailsID='" + detailsID + "'")
                     .add("relate='" + relate + "'")
                     .add("absoluteScore='" + absoluteScore + "'")
+                    .add("ksxzdm=" + ksxzdm)
                     .toString();
         }
     }

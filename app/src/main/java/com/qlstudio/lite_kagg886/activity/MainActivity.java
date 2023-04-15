@@ -101,13 +101,17 @@ public class MainActivity extends AppCompatActivity {
 
         //在onCreate里navView并未初始化，所以只能放在这
         binding.navView.findViewById(R.id.btn_exit).setOnClickListener((view) -> {
-            GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(GlobalApplication.getApplicationNoStatic().getSession().getStuCode()));
-            GlobalApplication.getApplicationNoStatic().getPreferences().edit().putString("pwd", "").apply();
-            Intent p = new Intent(this, LoginActivity.class);
-            startActivity(p);
-            finish();
+            logout();
         });
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    public void logout() {
+        GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(GlobalApplication.getApplicationNoStatic().getSession().getStuCode()));
+        GlobalApplication.getApplicationNoStatic().getPreferences().edit().putString("pwd", "").apply();
+        Intent p = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(p);
+        finish();
     }
 }

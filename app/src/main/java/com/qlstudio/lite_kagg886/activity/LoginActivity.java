@@ -132,7 +132,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             userName.setText(user);
         }
 
-        String pwd = GlobalApplication.getApplicationNoStatic().getPreferences().getString("pwd", null);
+        String pwd = GlobalApplication.getApplicationNoStatic().getPreferences().getString("pwd", "");
         if (!TextUtils.isEmpty(pwd)) {
             this.pwd.setText(pwd);
             onClick(null);
@@ -159,6 +159,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 Intent i = new Intent(this, MainActivity.class);
                 startActivity(i);
                 finish();
+                isLogin = false;
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);

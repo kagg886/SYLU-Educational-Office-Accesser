@@ -12,11 +12,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.kagg886.jxw_collector.protocol.beans.ExamResult;
 import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
+import com.qlstudio.lite_kagg886.activity.MainActivity;
+import com.qlstudio.lite_kagg886.adapter.ExamInfoAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -39,9 +43,7 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
 
     private Spinner choose_year, choose_term;
 
-    private RecyclerView view;
-
-    private Handler dialogController = new Handler(Looper.getMainLooper()) {
+    private final Handler dialogController = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {
@@ -52,9 +54,17 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
                     dialog.cancel();
                     dialog.dismiss();
                     break;
+                case 2:
+                    dialog.cancel();
+                    dialog.dismiss();
+                    Toast.makeText(getActivity(), "登录状态已过期，请重新登录", Toast.LENGTH_LONG).show();
+                    ((MainActivity) Objects.requireNonNull(getActivity())).logout();
+                    break;
             }
         }
     };
+    private RecyclerView container;
+    private ExamInfoAdapter adapter;
     private boolean isOnSelecting = false;
 
     @Nullable
@@ -66,12 +76,23 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_exam, null);
         choose_year = v.findViewById(R.id.fragment_exam_chooseYear);
         choose_term = v.findViewById(R.id.fragment_exam_chooseTerm);
-        view = v.findViewById(R.id.fragment_exam_container);
+
+        this.container = v.findViewById(R.id.fragment_exam_container);
+        adapter = new ExamInfoAdapter();
+        this.container.setAdapter(adapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        this.container.setLayoutManager(layoutManager);
+
         new Thread(() -> {
             SyluSession session = GlobalApplication.getApplicationNoStatic().getSession();
 
             //设置默认UI
-            result = session.getExamResult();
+            try {
+                result = session.getExamResult();
+            } catch (OfflineException e) {
+                dialogController.sendEmptyMessage(2);
+                return;
+            }
             new Handler(Looper.getMainLooper()).post(() -> {
 
                 //选定选择器
@@ -102,6 +123,7 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
         AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         builder.setTitle("加载中...");
         builder.setView(new ProgressBar(getActivity(), null, android.R.attr.progressBarStyleHorizontal));
+        builder.setCancelable(false);
         dialog = builder.create();
     }
 
@@ -113,10 +135,16 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
         isOnSelecting = true;
         dialogController.sendEmptyMessage(0);
         new Thread(() -> {
-            List<ExamResult.ExamInfo> info = result.queryResultByYearAndTerm(
-                    choose_year.getSelectedItem().toString(),
-                    choose_term.getSelectedItem().toString()
-            );
+            List<ExamResult.ExamInfo> info;
+            try {
+                info = result.queryResultByYearAndTerm(
+                        choose_year.getSelectedItem().toString(),
+                        choose_term.getSelectedItem().toString()
+                );
+            } catch (OfflineException e) {
+                dialogController.sendEmptyMessage(2);
+                return;
+            }
             updateUI(info);
             dialogController.sendEmptyMessage(1);
             isOnSelecting = false;
@@ -124,10 +152,13 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
     private void updateUI(List<ExamResult.ExamInfo> info) {
-
         new Handler(Looper.getMainLooper()).post(() -> {
-            //TODO 在此处更新RecyclerView中的内容逻辑
-            Toast.makeText(getActivity(), "共找到:" + info.size() + "条信息", Toast.LENGTH_SHORT).show();
+            adapter.getResults().clear();
+            //TODO 名字过长会导致布局错位，亟待解决
+//            Toast.makeText(getActivity(), "共找到:" + info.size() + "条信息", Toast.LENGTH_SHORT).show();
+            info.forEach((a) -> {
+                adapter.getResults().add(a);
+            });
         });
     }
 

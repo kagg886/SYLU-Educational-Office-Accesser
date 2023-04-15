@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">掌上沈理青春版</string>
+    <string name="app_name">Sylu-EOA</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preference Titles -->
@@ -27,7 +27,7 @@
     <string name="menu_home">课程表</string>
     <string name="menu_gallery">考试信息</string>
     <string name="menu_slideshow">关于</string>
-    <string name="login_error">提示验证码错误请重启程序</string>
+    <string name="login_error">Powered By kagg886</string>
     <string name="exam_year">学年</string>
     <string name="exam_term">学期</string>
     <string name="demo">demo</string>

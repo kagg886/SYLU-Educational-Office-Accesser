@@ -21,8 +21,7 @@
                 android:theme="@style/Theme.掌上沈理青春版.NoActionBar"/>
         <activity
                 android:name=".activity.LoginActivity"
-                android:exported="true"
-                android:label="@string/login">
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

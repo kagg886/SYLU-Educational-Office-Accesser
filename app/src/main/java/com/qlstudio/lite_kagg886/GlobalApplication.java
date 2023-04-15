@@ -1,12 +1,19 @@
 package com.qlstudio.lite_kagg886;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import androidx.preference.PreferenceManager;
 import com.kagg886.jxw_collector.protocol.SyluSession;
+import com.qlstudio.lite_kagg886.activity.LoginActivity;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -64,5 +71,41 @@ public class GlobalApplication extends Application {
         if (preferences.getString("user", null) != null) {
             session.setUser(preferences.getString("user", null));
         }
+    }
+
+    @SuppressLint({"DiscouragedPrivateApi", "PrivateApi"})
+    public static Activity getCurrentActivity() {
+        Activity current = null;
+        try {
+            Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
+            Object activityThread = activityThreadClass.getMethod("currentActivityThread").invoke(
+                    null);
+            Field activitiesField = activityThreadClass.getDeclaredField("mActivities");
+            activitiesField.setAccessible(true);
+            Map<?, ?> activities = (Map<?, ?>) activitiesField.get(activityThread);
+            for (Object activityRecord : activities.values()) {
+                Class<?> activityRecordClass = activityRecord.getClass();
+                Field pausedField = activityRecordClass.getDeclaredField("paused");
+                pausedField.setAccessible(true);
+                if (!pausedField.getBoolean(activityRecord)) {
+                    Field activityField = activityRecordClass.getDeclaredField("activity");
+                    activityField.setAccessible(true);
+                    current = (Activity) activityField.get(activityRecord);
+                }
+            }
+        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | NoSuchFieldException |
+                 IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        Log.d("SeikoApplication", "access getCurrentActivity:" + current);
+        return current;
+    }
+
+    public void logout() {
+        GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(GlobalApplication.getApplicationNoStatic().getSession().getStuCode()));
+        GlobalApplication.getApplicationNoStatic().getPreferences().edit().putString("pwd", "").apply();
+        Intent p = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(p);
+        getCurrentActivity().finish();
     }
 }

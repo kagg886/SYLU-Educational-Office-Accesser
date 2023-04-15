@@ -7,6 +7,9 @@ import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.kagg886.jxw_collector.protocol.beans.abs.YearSemesterSelectable;
 import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.util.*;
 
@@ -25,12 +28,39 @@ public class ExamResult extends YearSemesterSelectable {
         super(session, session.compile("/cjcx/cjcx_cxDgXscj.html?gnmkdm=N305005&layout=default&su=", session.getStuCode()));
     }
 
+    public List<List<String>> queryDetailsByExamInfo(ExamInfo i) {
+        SyluSession session = getSession();
+        session.assertLogin();
+        //jxb_id: F75019F3F5DA44D8E0530100050A0316
+        //xnm: 2022
+        //xqm: 12
+        //kcmc: 大学外语1
+        Connection.Response resp = session.getClient().url(session.compile("/cjcx/cjcx_cxCjxqGjh.html?time=", new Date().getTime(), "&gnmkdm=sssss&su=", session.getStuCode()))
+                .data("jxb_id", i.getDetailsID())
+                .data("xnm", i.getYear())
+                .data("xqm", i.getTerm())
+                .data("kcmc", i.getName()).post();
+
+        List<List<String>> rtn = new ArrayList<>();
+        Elements tr = Jsoup.parse(resp.body()).getElementsByTag("tr");
+        for (int j = 1; j < tr.size(); j++) {
+            List<String> trs = new ArrayList<>();
+            for (Element td : tr.get(j).getElementsByTag("td")) {
+                trs.add(td.text());
+            }
+            rtn.add(trs);
+        }
+        return rtn;
+    }
+
     public List<ExamInfo> queryResultByYearAndTerm(String year, String term) {
         SyluSession session = getSession();
         session.assertLogin();
+        String xnm = Objects.requireNonNull(getYears().getOrDefault(year, null));
+        String xqm = Objects.requireNonNull(getTeamVal().getOrDefault(term, null));
         HttpClient client = session.getClient().clearData().url(session.compile("/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=sssss&su=" + session.getStuCode()))
-                .data("xnm", Objects.requireNonNull(getYears().getOrDefault(year, null)))
-                .data("xqm", Objects.requireNonNull(getTeamVal().getOrDefault(term, null)))
+                .data("xnm", xnm)
+                .data("xqm", xqm)
                 .data("_search", "false")
                 .data("nd", String.valueOf(new Date().getTime()))
                 .data("queryModel.showCount", " 15")
@@ -54,7 +84,10 @@ public class ExamResult extends YearSemesterSelectable {
             String relateScore = o.getString("cj");
 
             int ksxzdm = Integer.parseInt(o.getString("ksxzdm"));
-            infos.add(new ExamInfo(name,
+            infos.add(new ExamInfo(
+                    o.getString("xnm"),
+                    o.getString("xqm"),
+                    name,
                     teacher,
                     gradePoint,
                     credit,
@@ -75,6 +108,9 @@ public class ExamResult extends YearSemesterSelectable {
 
     public static class ExamInfo {
 
+        private final String year; //学年代号
+        private final String term; //学期代号
+
         private final String name; //课程名
 
 
@@ -94,7 +130,10 @@ public class ExamResult extends YearSemesterSelectable {
         private final int ksxzdm; //判断重修或补考需要的凭证
 
 
-        public ExamInfo(String name, String teacher, String gradePoint, String credit, String gpTimesCr, String detailsID, String relate, String absoluteScore, int ksxzdm) {
+        public ExamInfo(String xnm, String xqm, String name, String teacher, String gradePoint, String credit, String gpTimesCr, String detailsID, String relate, String absoluteScore, int ksxzdm) {
+            this.year = xnm;
+            this.term = xqm;
+
             this.name = name;
             this.teacher = teacher;
             this.gradePoint = gradePoint;
@@ -129,8 +168,12 @@ public class ExamResult extends YearSemesterSelectable {
             return Status.SUCCESS;
         }
 
-        public int getKsxzdm() {
-            return ksxzdm;
+        public String getTerm() {
+            return term;
+        }
+
+        public String getYear() {
+            return year;
         }
 
         public String getGradePoint() {
@@ -168,6 +211,8 @@ public class ExamResult extends YearSemesterSelectable {
         @Override
         public String toString() {
             return new StringJoiner(", ", ExamInfo.class.getSimpleName() + "[", "]")
+                    .add("year='" + year + "'")
+                    .add("term='" + term + "'")
                     .add("name='" + name + "'")
                     .add("teacher='" + teacher + "'")
                     .add("gradePoint='" + gradePoint + "'")
@@ -175,7 +220,7 @@ public class ExamResult extends YearSemesterSelectable {
                     .add("gpTimesCr='" + gpTimesCr + "'")
                     .add("detailsID='" + detailsID + "'")
                     .add("relate='" + relate + "'")
-                    .add("absoluteScore='" + absoluteScore + "'")
+                    .add("absoluteScore=" + absoluteScore)
                     .add("ksxzdm=" + ksxzdm)
                     .toString();
         }

@@ -1,6 +1,5 @@
 package com.qlstudio.lite_kagg886.activity;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.*;
@@ -101,17 +100,9 @@ public class MainActivity extends AppCompatActivity {
 
         //在onCreate里navView并未初始化，所以只能放在这
         binding.navView.findViewById(R.id.btn_exit).setOnClickListener((view) -> {
-            logout();
+            GlobalApplication.getApplicationNoStatic().logout();
         });
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
-    }
-
-    public void logout() {
-        GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(GlobalApplication.getApplicationNoStatic().getSession().getStuCode()));
-        GlobalApplication.getApplicationNoStatic().getPreferences().edit().putString("pwd", "").apply();
-        Intent p = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivity(p);
-        finish();
     }
 }

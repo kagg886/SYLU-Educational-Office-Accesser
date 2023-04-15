@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.kagg886.jxw_collector.exceptions.OfflineException;
@@ -19,7 +20,6 @@ import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.kagg886.jxw_collector.protocol.beans.ExamResult;
 import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
-import com.qlstudio.lite_kagg886.activity.MainActivity;
 import com.qlstudio.lite_kagg886.adapter.ExamInfoAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +58,7 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
                     dialog.cancel();
                     dialog.dismiss();
                     Toast.makeText(getActivity(), "登录状态已过期，请重新登录", Toast.LENGTH_LONG).show();
-                    ((MainActivity) Objects.requireNonNull(getActivity())).logout();
+                    GlobalApplication.getApplicationNoStatic().logout();
                     break;
             }
         }
@@ -78,11 +78,6 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
         choose_term = v.findViewById(R.id.fragment_exam_chooseTerm);
 
         this.container = v.findViewById(R.id.fragment_exam_container);
-        adapter = new ExamInfoAdapter();
-        this.container.setAdapter(adapter);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        this.container.setLayoutManager(layoutManager);
-
         new Thread(() -> {
             SyluSession session = GlobalApplication.getApplicationNoStatic().getSession();
 
@@ -94,6 +89,10 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
                 return;
             }
             new Handler(Looper.getMainLooper()).post(() -> {
+                adapter = new ExamInfoAdapter(result);
+                this.container.setAdapter(adapter);
+                this.container.setLayoutManager(new LinearLayoutManager(getContext()));
+                this.container.addItemDecoration(new DividerItemDecoration(Objects.requireNonNull(getContext()), DividerItemDecoration.VERTICAL));
 
                 //选定选择器
                 String[] yearArr = result.getYears().keySet().toArray(new String[0]);

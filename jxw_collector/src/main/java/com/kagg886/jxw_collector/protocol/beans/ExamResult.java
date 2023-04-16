@@ -35,11 +35,14 @@ public class ExamResult extends YearSemesterSelectable {
         //xnm: 2022
         //xqm: 12
         //kcmc: 大学外语1
-        Connection.Response resp = session.getClient().url(session.compile("/cjcx/cjcx_cxCjxqGjh.html?time=", new Date().getTime(), "&gnmkdm=sssss&su=", session.getStuCode()))
+        Connection.Response resp;
+        resp = session.getClient().url(session.compile("/cjcx/cjcx_cxCjxqGjh.html?time=", new Date().getTime(), "&gnmkdm=N305005&su=", session.getStuCode()))
                 .data("jxb_id", i.getDetailsID())
                 .data("xnm", i.getYear())
                 .data("xqm", i.getTerm())
-                .data("kcmc", i.getName()).post();
+                .data("kcmc", i.getName())
+                .header("Referer", session.compile("/cjcx/cjcx_cxDgXscj.html?gnmkdm=N305005&layout=default&su=", session.getStuCode()))
+                .post();
 
         List<List<String>> rtn = new ArrayList<>();
         Elements tr = Jsoup.parse(resp.body()).getElementsByTag("tr");

@@ -67,7 +67,9 @@ public class ExamInfoAdapter extends RecyclerView.Adapter<ExamInfoAdapter.ExamIn
 
         builder.setView(view);
         builder.create().show();
-    }    private final List<ExamResult.ExamInfo> results = new ArrayList<ExamResult.ExamInfo>() {
+    }
+
+    private final List<ExamResult.ExamInfo> results = new ArrayList<ExamResult.ExamInfo>() {
         @Override
         public boolean add(ExamResult.ExamInfo examInfo) {
             boolean a = super.add(examInfo);
@@ -82,7 +84,6 @@ public class ExamInfoAdapter extends RecyclerView.Adapter<ExamInfoAdapter.ExamIn
             notifyDataSetChanged();
         }
     };
-
 
 
     @Override

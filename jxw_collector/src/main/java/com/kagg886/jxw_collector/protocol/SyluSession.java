@@ -73,7 +73,7 @@ public class SyluSession {
                 "&_=", new Date().getTime()));
         Connection.Response resp = client.get();
         client.header("Cookie", resp.header("Set-Cookie"))
-                .header("Content-Type", "application/x-www-form-urlencoded");
+                .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
         this.rsaSession = JSON.parseObject(resp.body());
     }
 

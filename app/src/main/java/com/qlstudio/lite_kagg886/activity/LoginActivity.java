@@ -118,8 +118,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         application = GlobalApplication.getApplicationNoStatic();
 
         initView();
-
-        throw new RuntimeException("Test");
     }
 
     private void initView() {

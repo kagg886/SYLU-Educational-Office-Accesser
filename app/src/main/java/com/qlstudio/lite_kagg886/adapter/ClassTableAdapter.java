@@ -59,7 +59,7 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
             holder.name.setText("星期" + position);
         }
         if (position % 8 == 0) {
-            holder.name.setText("第" + ((position / 8) + 1) + "节");
+            holder.name.setText("第" + (position / 8) + "节");
             holder.room.setText("10:00");
             return;
         }

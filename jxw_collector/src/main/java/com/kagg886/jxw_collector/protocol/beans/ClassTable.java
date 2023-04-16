@@ -55,9 +55,19 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
     public ClassTable queryClassByWeek(int week) {
         ClassTable rtn = new ClassTable();
         rtn.addAll(this.stream().filter(classUnit -> {
-            for (int[] weekRange : classUnit.getWeekAsMinMax()) {
-                if (week >= weekRange[0] && week <= weekRange[1]) {
-                    return true;
+            for (Range range : classUnit.getWeekAsMinMax()) {
+                if (week >= range.getStart() && week <= range.getEnd()) {
+                    switch (range.getType()) {
+                        case ALL -> {
+                            return true;
+                        }
+                        case SINGULAR -> {
+                            return week % 2 == 1;
+                        }
+                        case EVEN -> {
+                            return week % 2 == 0;
+                        }
+                    }
                 }
             }
             return false;
@@ -75,6 +85,12 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
         ClassTable rtn = new ClassTable();
         rtn.addAll(this.stream().filter(classUnit -> classUnit.getDayInWeek() == day).collect(Collectors.toList()));
         return rtn;
+    }
+
+    public enum FilterType {
+        ALL, //单双周
+        SINGULAR,//单周
+        EVEN;//双周
     }
 
     public static class ClassUnit {
@@ -123,25 +139,31 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
             return weekEachLesson;
         }
 
-        public List<int[]> getWeekAsMinMax() { //列表中每个数组代表起止
-            List<int[]> rtn = new ArrayList<>();
+        public List<Range> getWeekAsMinMax() { //列表中每个数组代表起止
+            List<Range> rtn = new ArrayList<>();
             for (String a : weekEachLesson.split(",")) {
                 a = a.substring(0, a.length() - 1);
                 if (a.contains("-")) {
                     String[] k = a.split("-");
-                    rtn.add(new int[]{
-                            Integer.parseInt(k[0]),
-                            Integer.parseInt(k[1])
-                    });
+                    int l;
+                    FilterType type = FilterType.ALL;
+                    try {
+                        l = Integer.parseInt(k[1]);
+                    } catch (NumberFormatException e) {
+                        l = Integer.parseInt(k[1].split("周")[0]);
+                        switch (k[1].split("\\(")[1]) {
+                            case "单" -> type = FilterType.SINGULAR;
+                            case "双" -> type = FilterType.EVEN;
+                        }
+                    }
+                    rtn.add(new Range(Integer.parseInt(k[0]), l, type));
                     continue;
                 }
-                rtn.add(new int[]{
-                        Integer.parseInt(a),
-                        Integer.parseInt(a)
-                });
+                rtn.add(new Range(Integer.parseInt(a), Integer.parseInt(a), FilterType.ALL));
             }
             return rtn;
         }
+
 
         public String getLesson() {
             return lesson;
@@ -155,7 +177,40 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
                     .add("room='" + room + "'")
                     .add("weekEachLesson='" + weekEachLesson + "'")
                     .add("lesson='" + lesson + "'")
-                    .add("dayInWeek='" + dayInWeek + "'")
+                    .add("dayInWeek=" + dayInWeek)
+                    .toString();
+        }
+    }
+
+    public static class Range {
+        private final int start;
+        private final int end;
+        private final FilterType type;
+
+        public Range(int start, int end, FilterType type) {
+            this.start = start;
+            this.end = end;
+            this.type = type;
+        }
+
+        public int getStart() {
+            return start;
+        }
+
+        public int getEnd() {
+            return end;
+        }
+
+        public FilterType getType() {
+            return type;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Range.class.getSimpleName() + "[", "]")
+                    .add("start=" + start)
+                    .add("end=" + end)
+                    .add("type=" + type)
                     .toString();
         }
     }

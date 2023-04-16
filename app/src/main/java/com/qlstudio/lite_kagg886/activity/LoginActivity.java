@@ -18,9 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
+
+import java.net.SocketTimeoutException;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -164,7 +167,15 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 runOnUiThread(() -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("登陆失败");
-                    builder.setMessage(e.getMessage());
+                    if (e instanceof NullPointerException) {
+                        builder.setMessage("无法连接到教务网，请检查网络状态后重试");
+                    } else if ((e instanceof OfflineException)) {
+                        builder.setMessage(e.getMessage());
+                    } else if (e instanceof SocketTimeoutException) {
+                        builder.setMessage("连接超时!请检查网络状态后重试");
+                    } else {
+                        builder.setMessage("未知错误:" + e.getMessage());
+                    }
                     builder.create().show();
                 });
             }

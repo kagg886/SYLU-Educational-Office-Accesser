@@ -36,24 +36,7 @@ import java.util.Objects;
  * @version: 1.0
  */
 public class AboutFragment extends Fragment implements View.OnClickListener {
-    @Nullable
-    @org.jetbrains.annotations.Nullable
-    @Override
-    public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        return new AboutPage(getActivity())
-                .isRTL(false)
-                .setImage(R.mipmap.ic_launcher)//图片
-                .setDescription("一个令人舒适的教务信息集成APP")//介绍
-                .addItem(new Element().setTitle("Version：" + BuildConfig.VERSION_NAME))
-                .addItem(new Element().setIconDrawable(R.drawable.ic_update).setTitle("检查更新").setOnClickListener(this))
-                .addGroup("关注我")
-                .addEmail("iveour@163.com", "个人邮箱")//邮箱
-                .addWebsite("https://kagg886.top", "个人博客")//网站
-                .addGitHub("kagg886/SYLU-Educational-Office-Accesser", "查看源代码")//github
-                .create();
-    }
-
-    private Handler checkHandler = new Handler(Looper.getMainLooper()) {
+    private final Handler checkHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {
@@ -89,6 +72,35 @@ public class AboutFragment extends Fragment implements View.OnClickListener {
             }
         }
     };
+
+    @Nullable
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        return new AboutPage(getActivity())
+                .isRTL(false)
+                .setImage(R.mipmap.ic_launcher)//图片
+                .setDescription("一个令人舒适的教务信息集成APP")//介绍
+                .addItem(new Element().setTitle("Version：" + BuildConfig.VERSION_NAME))
+                .addItem(new Element().setIconDrawable(R.drawable.ic_update).setTitle("检查更新").setOnClickListener(this))
+                .addGroup("关注我")
+                .addEmail("iveour@163.com", "个人邮箱")//邮箱
+                .addWebsite("https://kagg886.top", "个人博客")//网站
+                .addGitHub("kagg886/SYLU-Educational-Office-Accesser", "查看源代码")//github
+                .addItem(new Element()
+                        .setIconDrawable(R.drawable.ic_add_qq_group)
+                        .setTitle("加入QQ群")
+                        .setIntent(getIntent())
+                )
+                .create();
+    }
+
+    private Intent getIntent() {
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.VIEW");
+        intent.setData(Uri.parse("mqqapi://card/show_pslcard?src_type=internal&version=1&uin=798201505&card_type=group&source=qrcode"));
+        return intent;
+    }
 
     @Override
     public void onClick(View v) {

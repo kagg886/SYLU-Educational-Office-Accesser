@@ -35,6 +35,17 @@ public class BaseAPITest {
     }
 
     @Test
+    public void testClassTableWithBiWeekly() {
+        SyluSession session = new SyluSession("2203130102");
+        session.loginByPwd("One20040813");
+        Schedule schedule = session.getSchedule();
+        ClassTable table = schedule.queryClassByYearAndTerm("2022-2023", "2");
+        for (ClassTable.ClassUnit a : table) {
+            a.getWeekAsMinMax().forEach(System.out::println);
+        }
+    }
+
+    @Test
     public void testClassTableGet() {
         SyluSession session = new SyluSession("2203050528");
         session.loginByPwd(pwd);

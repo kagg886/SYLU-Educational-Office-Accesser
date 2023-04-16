@@ -93,6 +93,7 @@ public class SyluSession {
         if (test != null) {
             throw new OfflineException.LoginFailed("登陆失败:" + test.text());
         }
+        isLogin = true;
     }
 
     public void loginByCookie(String cookie) {

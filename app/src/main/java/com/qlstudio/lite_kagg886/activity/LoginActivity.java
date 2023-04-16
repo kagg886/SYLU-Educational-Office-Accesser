@@ -23,7 +23,7 @@ import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
 
-import java.net.SocketTimeoutException;
+import java.util.Objects;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -118,6 +118,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         application = GlobalApplication.getApplicationNoStatic();
 
         initView();
+
+        throw new RuntimeException("Test");
     }
 
     private void initView() {
@@ -171,7 +173,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                         builder.setMessage("无法连接到教务网，请检查网络状态后重试");
                     } else if ((e instanceof OfflineException)) {
                         builder.setMessage(e.getMessage());
-                    } else if (e instanceof SocketTimeoutException) {
+                    } else if (Objects.requireNonNull(e.getMessage()).contains("Read timeout")) {
                         builder.setMessage("连接超时!请检查网络状态后重试");
                     } else {
                         builder.setMessage("未知错误:" + e.getMessage());

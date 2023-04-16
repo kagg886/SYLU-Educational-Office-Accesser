@@ -3,6 +3,7 @@ package com.qlstudio.lite_kagg886.activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.*;
+import android.view.KeyEvent;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -104,5 +105,11 @@ public class MainActivity extends AppCompatActivity {
         });
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        finish();
+        return true;
     }
 }

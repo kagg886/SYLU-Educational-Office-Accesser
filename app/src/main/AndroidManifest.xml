@@ -19,6 +19,13 @@
                 android:exported="false"
                 android:label="@string/title_activity_main"
                 android:theme="@style/Theme.掌上沈理青春版.NoActionBar"/>
+
+        <activity
+                android:name=".activity.ErrorActivity"
+                android:exported="false"
+                android:label="出错惹!"
+                android:theme="@style/Theme.掌上沈理青春版.NoActionBar"/>
+
         <activity
                 android:name=".activity.LoginActivity"
                 android:exported="true">

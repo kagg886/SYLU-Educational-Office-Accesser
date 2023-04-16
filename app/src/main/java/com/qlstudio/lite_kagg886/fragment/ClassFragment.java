@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
+import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.beans.ClassTable;
 import com.kagg886.jxw_collector.protocol.beans.Schedule;
 import com.kagg886.jxw_collector.protocol.beans.SchoolCalendar;
@@ -55,7 +56,13 @@ public class ClassFragment extends Fragment {
 
         new Thread(() -> {
             Schedule schedule = GlobalApplication.getApplicationNoStatic().getSession().getSchedule();
-            ClassTable table = schedule.queryClassByYearAndTerm(schedule.getDefaultYears(), schedule.getDefaultTeamVal());
+            ClassTable table;
+            try {
+                table = schedule.queryClassByYearAndTerm(schedule.getDefaultYears(), schedule.getDefaultTeamVal());
+            } catch (OfflineException e) {
+                GlobalApplication.getApplicationNoStatic().logout();
+                return;
+            }
             int a = 0;
             ClassTable perWeek;
             while ((perWeek = table.queryClassByWeek(a + 1)).size() != 0) {

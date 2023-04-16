@@ -7,6 +7,7 @@ import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.internal.RSA;
 import com.kagg886.jxw_collector.protocol.beans.ExamResult;
 import com.kagg886.jxw_collector.protocol.beans.Schedule;
+import com.kagg886.jxw_collector.protocol.beans.SchoolCalendar;
 import com.kagg886.jxw_collector.protocol.beans.UserInfo;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -33,6 +34,10 @@ public class SyluSession {
     private String user;//用户名
 
     private JSONObject rsaSession; //获取RSA信息
+
+    private long stamp; //最近一次检查登录的成果
+
+    private boolean isLogin; //最近一次检查登录是否成功
 
     public SyluSession(String user) {
         client = new HttpClient();
@@ -96,14 +101,20 @@ public class SyluSession {
     }
 
     public boolean isLogin() {
+        if (System.currentTimeMillis() - stamp > 1000) {
+            return isLogin;
+        }
+        stamp = System.currentTimeMillis();
         client.url(compile("/xtgl/index_initMenu.html?jsdm=xs&_t=" + new Date().getTime()));
         Connection.Response resp = client.get();
         Document document = Jsoup.parse(resp.body());
         for (Element e : document.getElementsByTag("h5")) {
             if (e.text().equals("用户登录")) {
+                isLogin = false;
                 return false;
             }
         }
+        isLogin = true;
         return true;
     }
 
@@ -124,6 +135,10 @@ public class SyluSession {
         return new UserInfo(compile(avt), name, clazz);
     }
 
+    public SchoolCalendar getSchoolCalendar() {
+        return new SchoolCalendar(this);
+    }
+
     public ExamResult getExamResult() {
         return new ExamResult(this);
     }
@@ -133,6 +148,7 @@ public class SyluSession {
     }
 
     public void assertLogin() {
+
         if (!isLogin()) {
             throw new OfflineException("登录状态为未登录或踢下线");
         }

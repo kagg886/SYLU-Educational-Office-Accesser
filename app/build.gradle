@@ -44,6 +44,7 @@ dependencies {
 
     implementation 'io.github.medyo:android-about-page:2.0.0' //关于页面库
 
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
 
     implementation "com.alibaba:fastjson:1.2.76"
 

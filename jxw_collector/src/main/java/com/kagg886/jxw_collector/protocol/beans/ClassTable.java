@@ -10,6 +10,7 @@ import org.jsoup.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -60,13 +61,19 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
                 }
             }
             return false;
-        }).toList());
+        }).collect(Collectors.toList()));
+        return rtn;
+    }
+
+    public ClassTable queryClassByLesson(String lesson) {
+        ClassTable rtn = new ClassTable();
+        rtn.addAll(this.stream().filter(classUnit -> classUnit.lesson.equals(lesson)).collect(Collectors.toList()));
         return rtn;
     }
 
     public ClassTable queryClassByDay(int day) {
         ClassTable rtn = new ClassTable();
-        rtn.addAll(this.stream().filter(classUnit -> classUnit.getDayInWeek() == day).toList());
+        rtn.addAll(this.stream().filter(classUnit -> classUnit.getDayInWeek() == day).collect(Collectors.toList()));
         return rtn;
     }
 

@@ -48,7 +48,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private volatile boolean isLogin = false;
 
-    private Handler animController = new Handler(Looper.getMainLooper()) {
+    private final Handler animController = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {

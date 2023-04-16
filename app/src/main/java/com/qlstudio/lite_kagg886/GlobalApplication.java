@@ -105,6 +105,7 @@ public class GlobalApplication extends Application {
         GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(GlobalApplication.getApplicationNoStatic().getSession().getStuCode()));
         GlobalApplication.getApplicationNoStatic().getPreferences().edit().putString("pwd", "").apply();
         Intent p = new Intent(getApplicationContext(), LoginActivity.class);
+        p.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?
         startActivity(p);
         getCurrentActivity().finish();
     }

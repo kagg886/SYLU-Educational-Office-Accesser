@@ -1,139 +1,110 @@
 package com.qlstudio.lite_kagg886.widget;
 
-import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
+import android.graphics.Rect;
 import android.view.View;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-/**
- * @projectName: 掌上沈理青春版
- * @package: com.qlstudio.lite_kagg886.widget
- * @className: GridItemDecoration
- * @author: kagg886
- * @description: 网格布局的分割线绘制器
- * @date: 2023/4/15 10:33
- * @version: 1.0
- */
+import java.util.Objects;
+
 public class GridItemDecoration extends RecyclerView.ItemDecoration {
+    private int mDividerHeight = 2;
+    private int mDividerColor = 0xFFFF0000;
+    private Paint mPaint;
+    private int mOrientation;
 
-    public final int[] ATRRS = new int[]{android.R.attr.listDivider};
-    private Drawable mDividerDarwable;
-    private int mDividerHight = 1;
-    private Paint mColorPaint;
-
-    public GridItemDecoration(Context context) {
-        final TypedArray ta = context.obtainStyledAttributes(ATRRS);
-        this.mDividerDarwable = ta.getDrawable(0);
-        ta.recycle();
+    public GridItemDecoration(@RecyclerView.Orientation int orientation) {
+        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setColor(mDividerColor);
+        mOrientation = orientation;
     }
 
-    /*
-     int dividerHight  分割线的线宽
-     int dividerColor  分割线的颜色
-     */
-    public GridItemDecoration(Context context, int dividerHight, int dividerColor) {
-        this(context);
-        mDividerHight = dividerHight;
-        mColorPaint = new Paint();
-        mColorPaint.setColor(dividerColor);
+    @Override
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+        GridLayoutManager layoutManager = (GridLayoutManager) parent.getLayoutManager();
+        int itemCount = parent.getAdapter().getItemCount();
+        int viewLayoutPosition = ((RecyclerView.LayoutParams) view.getLayoutParams()).getViewLayoutPosition();
+
+        int left = 0;
+        int top = 0;
+        int right = mDividerHeight;
+        int bottom = mDividerHeight;
+//        if (isLastRow(layoutManager, itemCount, viewLayoutPosition)) {
+//            // 如果是最后一行，则不需要绘制底部
+//            bottom = 0;
+//        }
+//        if (isLastCol(layoutManager, itemCount, viewLayoutPosition)) {
+//            // 如果是最后一列，则不需要绘制右边
+//            right = 0;
+//        }
+
+        outRect.set(left, top, right, bottom);
     }
 
-    /*
-     int dividerHight  分割线的线宽
-     Drawable dividerDrawable  图片分割线
+    /**
+     * 判断是否最后一列
      */
-    public GridItemDecoration(Context context, int dividerHight, Drawable dividerDrawable) {
-        this(context);
-        mDividerHight = dividerHight;
-        mDividerDarwable = dividerDrawable;
+    private boolean isLastCol(GridLayoutManager layoutManager, int childCount, int itemPosition) {
+        GridLayoutManager.SpanSizeLookup spanSizeLookup = layoutManager.getSpanSizeLookup();
+        int spanCount = layoutManager.getSpanCount();
+        int spanIndex = spanSizeLookup.getSpanIndex(itemPosition, spanCount);
+        int spanSize = spanSizeLookup.getSpanSize(itemPosition);
+
+        if (mOrientation == GridLayoutManager.VERTICAL) {
+            return spanIndex + spanSize == spanCount;
+        } else {
+            return (childCount - itemPosition) / (spanCount * 1.0f) <= 1;
+        }
+    }
+
+    /**
+     * 判断是否最后一行
+     */
+    private boolean isLastRow(GridLayoutManager layoutManager, int childCount, int itemPosition) {
+        GridLayoutManager.SpanSizeLookup spanSizeLookup = layoutManager.getSpanSizeLookup();
+        int spanCount = layoutManager.getSpanCount();
+        int spanIndex = spanSizeLookup.getSpanIndex(itemPosition, spanCount);
+        int spanSize = spanSizeLookup.getSpanSize(itemPosition);
+
+        if (mOrientation == GridLayoutManager.VERTICAL) {
+            return (childCount - itemPosition) / (spanCount * 1.0f) <= 1;
+        } else {
+            return spanIndex + spanSize == spanCount;
+        }
     }
 
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        super.onDraw(c, parent, state);
-        //画水平和垂直分割线
-        drawHorizontalDivider(c, parent);
-        drawVerticalDivider(c, parent);
+        c.save();
+        int childCount = parent.getChildCount();
+
+        for (int i = 0; i < childCount; i++) {
+            View childAt = parent.getChildAt(i);
+            if (i <= ((GridLayoutManager) Objects.requireNonNull(parent.getLayoutManager())).getSpanCount()) {
+                c.drawLine(childAt.getX(), 0, childAt.getX() + childAt.getWidth(), 0, mPaint);
+                c.drawLine(childAt.getX(), 1, childAt.getX() + childAt.getWidth(), 1, mPaint);
+            }
+            drawHorizontal(c, childAt);
+            drawVertical(c, childAt);
+        }
+        c.restore();
     }
 
-    public void drawVerticalDivider(Canvas c, RecyclerView parent) {
-        final int childCount = parent.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            final View child = parent.getChildAt(i);
-            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-
-            final int top = child.getTop() - params.topMargin;
-            final int bottom = child.getBottom() + params.bottomMargin;
-
-            int left = 0;
-            int right = 0;
-
-            //左边第一列
-            if ((i % 3) == 0) {
-                //item左边分割线
-                left = child.getLeft();
-                right = left + mDividerHight;
-                mDividerDarwable.setBounds(left, top, right, bottom);
-                mDividerDarwable.draw(c);
-                if (mColorPaint != null) {
-                    c.drawRect(left, top, right, bottom, mColorPaint);
-                }
-                //item右边分割线
-                left = child.getRight() + params.rightMargin - mDividerHight;
-                right = left + mDividerHight;
-            } else {
-                //非左边第一列
-                left = child.getRight() + params.rightMargin - mDividerHight;
-                right = left + mDividerHight;
-            }
-            //画分割线
-            mDividerDarwable.setBounds(left, top, right, bottom);
-            mDividerDarwable.draw(c);
-            if (mColorPaint != null) {
-                c.drawRect(left, top, right, bottom, mColorPaint);
-            }
-
-        }
+    public void drawHorizontal(Canvas c, View childAt) {
+        int left = childAt.getLeft();
+        int right = childAt.getRight();
+        int top = childAt.getBottom();
+        int bottom = childAt.getBottom() + mDividerHeight;
+        c.drawRect(left, top, right, bottom, mPaint);
     }
 
-    public void drawHorizontalDivider(Canvas c, RecyclerView parent) {
-
-        final int childCount = parent.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            final View child = parent.getChildAt(i);
-            RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-
-            final int left = child.getLeft() - params.leftMargin - mDividerHight;
-            final int right = child.getRight() + params.rightMargin;
-            int top = 0;
-            int bottom = 0;
-
-            // 最上面一行
-            if ((i / 3) == 0) {
-                //当前item最上面的分割线
-                top = child.getTop();
-                //当前item下面的分割线
-                bottom = top + mDividerHight;
-                mDividerDarwable.setBounds(left, top, right, bottom);
-                mDividerDarwable.draw(c);
-                if (mColorPaint != null) {
-                    c.drawRect(left, top, right, bottom, mColorPaint);
-                }
-                top = child.getBottom() + params.bottomMargin;
-                bottom = top + mDividerHight;
-            } else {
-                top = child.getBottom() + params.bottomMargin;
-                bottom = top + mDividerHight;
-            }
-            //画分割线
-            mDividerDarwable.setBounds(left, top, right, bottom);
-            mDividerDarwable.draw(c);
-            if (mColorPaint != null) {
-                c.drawRect(left, top, right, bottom, mColorPaint);
-            }
-        }
+    public void drawVertical(Canvas c, View childAt) {
+        int left = childAt.getRight();
+        int right = left + mDividerHeight;
+        int top = childAt.getTop();
+        int bottom = childAt.getBottom() + mDividerHeight;
+        c.drawRect(left, top, right, bottom, mPaint);
     }
 }

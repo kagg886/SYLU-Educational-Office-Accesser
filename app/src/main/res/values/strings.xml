@@ -30,5 +30,5 @@
     <string name="login_error">Powered By kagg886</string>
     <string name="exam_year">学年</string>
     <string name="exam_term">学期</string>
-    <string name="demo">demo</string>
+    <string name="demo">Loading…</string>
 </resources>

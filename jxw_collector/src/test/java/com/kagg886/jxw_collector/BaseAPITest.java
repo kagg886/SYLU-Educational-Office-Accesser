@@ -89,7 +89,16 @@ public class BaseAPITest {
 
         table0 = table.queryClassByWeek(14).queryClassByDay(1);
         System.out.println(table0);
-        Assertions.assertEquals(3,table0.size());
+        Assertions.assertEquals(3, table0.size());
+    }
+
+    @Test
+    public void testClassQueryByLesson() {
+        SyluSession session = new SyluSession("2203050528");
+        session.loginByPwd(pwd);
+        Schedule schedule = session.getSchedule();
+        ClassTable table = schedule.queryClassByYearAndTerm("2022-2023", "2");
+        System.out.println(table.queryClassByLesson("1-2").toString());
     }
 
     @Test
@@ -102,5 +111,17 @@ public class BaseAPITest {
 
         session.loginByPwd(pwd);
         System.out.println(session.getUserInfo().toString());
+    }
+
+    @Test
+    public void testSchoolCalendar() {
+        SyluSession session = new SyluSession("2203050528");
+        Assertions.assertThrows(OfflineException.class, () -> {
+            UserInfo info = session.getUserInfo();
+            System.out.println(info);
+        });
+
+        session.loginByPwd(pwd);
+        System.out.println(session.getSchoolCalendar().toString());
     }
 }

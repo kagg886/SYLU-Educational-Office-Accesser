@@ -56,6 +56,11 @@ public class SchoolCalendar {
         return terms;
     }
 
+    public int getWeekFromStart() {
+        LocalDate now = LocalDate.now();
+        return (now.getDayOfYear() - start.getDayOfYear()) / 7 + 1;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", SchoolCalendar.class.getSimpleName() + "[", "]")

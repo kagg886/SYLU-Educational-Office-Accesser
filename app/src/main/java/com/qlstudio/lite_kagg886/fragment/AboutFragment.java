@@ -1,17 +1,30 @@
 package com.qlstudio.lite_kagg886.fragment;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import com.qlstudio.lite_kagg886.BuildConfig;
 import com.qlstudio.lite_kagg886.R;
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+
+import java.util.Objects;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -40,8 +53,61 @@ public class AboutFragment extends Fragment implements View.OnClickListener {
                 .create();
     }
 
+    private Handler checkHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            JSONObject data;
+            try {
+                data = new JSONObject(msg.getData().getString("update"));
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            String body = data.optString("body");
+            String title = data.optString("tag_name");
+            builder.setTitle(("发现更新:V" + BuildConfig.VERSION_NAME) + "->V" + title);
+            builder.setMessage(body.substring(0, Math.min(body.length() - 1, 500)) + (body.length() - 1 > 500 ? "..." : ""));
+            builder.setPositiveButton("下载", (dialog, which) -> {
+                JSONArray a = data.optJSONArray("assets");
+                for (int i = 0; i < a.length(); i++) {
+                    if (a.optJSONObject(i).optString("name").equals("app-release.apk")) {
+                        openUrlByBrowser(a.optJSONObject(i).optString("browser_download_url"));
+                        return;
+                    }
+                }
+            });
+            builder.create().show();
+        }
+    };
+
     @Override
     public void onClick(View v) {
-        //TODO 接入github信息检查
+        //TODO 接入gitee信息检查
+        checkUpdate();
+    }
+
+    private void checkUpdate() {
+        new Thread(() -> {
+            try {
+                JSONObject object = new JSONObject(
+                        Jsoup.connect("https://gitee.com/api/v5/repos/kagg886/sylu-educational-office-accesser/releases/latest")
+                                .ignoreContentType(true)
+                                .timeout(10000)
+                                .execute().body());
+                String newVer = object.optString("tag_name");
+                if (!BuildConfig.VERSION_NAME.equals(newVer)) {
+                    Message message = new Message();
+                    message.getData().putString("update", object.toString());
+                    checkHandler.sendMessage(message);
+                }
+            } catch (Exception e) {
+                Toast.makeText(getActivity(), "更新检测失败...", Toast.LENGTH_SHORT).show();
+            }
+        }).start();
+    }
+
+    private void openUrlByBrowser(String url) {
+        Uri uri = Uri.parse(url);
+        Objects.requireNonNull(getActivity()).startActivity(new Intent(Intent.ACTION_VIEW, uri));
     }
 }

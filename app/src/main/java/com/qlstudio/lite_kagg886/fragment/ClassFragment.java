@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 import com.kagg886.jxw_collector.protocol.beans.ClassTable;
 import com.kagg886.jxw_collector.protocol.beans.Schedule;
+import com.kagg886.jxw_collector.protocol.beans.SchoolCalendar;
 import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.adapter.ContentPagerAdapter;
@@ -59,12 +60,19 @@ public class ClassFragment extends Fragment {
             ClassTable perWeek;
             while ((perWeek = table.queryClassByWeek(a + 1)).size() != 0) {
                 final ClassTable perWeek0 = perWeek;
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    adapter.getData().add(new ClassPerWeekFragment(perWeek0));
-                });
+                new Handler(Looper.getMainLooper()).post(() ->
+                        adapter.getData().add(new ClassPerWeekFragment(perWeek0))
+                );
                 a++;
 //                break; //仅仅拿第一周做测试，
             }
+            //设置到正确的周数
+            SchoolCalendar calendar = GlobalApplication.getApplicationNoStatic().getSession().getSchoolCalendar();
+
+
+            new Handler(Looper.getMainLooper()).post(() -> {
+                pager2.setCurrentItem(calendar.getWeekFromStart() - 1, false); //防止一瞬间滑动n次造成的卡顿
+            });
         }).start();
         return v;
     }

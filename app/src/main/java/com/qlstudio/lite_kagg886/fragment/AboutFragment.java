@@ -56,27 +56,37 @@ public class AboutFragment extends Fragment implements View.OnClickListener {
     private Handler checkHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
-            JSONObject data;
-            try {
-                data = new JSONObject(msg.getData().getString("update"));
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            String body = data.optString("body");
-            String title = data.optString("tag_name");
-            builder.setTitle(("发现更新:V" + BuildConfig.VERSION_NAME) + "->V" + title);
-            builder.setMessage(body.substring(0, Math.min(body.length() - 1, 500)) + (body.length() - 1 > 500 ? "..." : ""));
-            builder.setPositiveButton("下载", (dialog, which) -> {
-                JSONArray a = data.optJSONArray("assets");
-                for (int i = 0; i < a.length(); i++) {
-                    if (a.optJSONObject(i).optString("name").equals("app-release.apk")) {
-                        openUrlByBrowser(a.optJSONObject(i).optString("browser_download_url"));
-                        return;
+            switch (msg.what) {
+                case 0:
+                    JSONObject data;
+                    try {
+                        data = new JSONObject(msg.getData().getString("update"));
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
                     }
-                }
-            });
-            builder.create().show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    String body = data.optString("body");
+                    String title = data.optString("tag_name");
+                    builder.setTitle(("发现更新:V" + BuildConfig.VERSION_NAME) + "->V" + title);
+                    builder.setMessage(body.substring(0, Math.min(body.length() - 1, 500)) + (body.length() - 1 > 500 ? "..." : ""));
+                    builder.setPositiveButton("下载", (dialog, which) -> {
+                        JSONArray a = data.optJSONArray("assets");
+                        for (int i = 0; i < a.length(); i++) {
+                            if (a.optJSONObject(i).optString("name").equals("app-release.apk")) {
+                                openUrlByBrowser(a.optJSONObject(i).optString("browser_download_url"));
+                                return;
+                            }
+                        }
+                    });
+                    builder.create().show();
+                    break;
+                case 1:
+                    Toast.makeText(getActivity(), "当前为最新版本!", Toast.LENGTH_SHORT).show();
+                    break;
+                case 2:
+                    Toast.makeText(getActivity(), "更新检测失败...", Toast.LENGTH_SHORT).show();
+                    break;
+            }
         }
     };
 
@@ -97,11 +107,14 @@ public class AboutFragment extends Fragment implements View.OnClickListener {
                 String newVer = object.optString("tag_name");
                 if (!BuildConfig.VERSION_NAME.equals(newVer)) {
                     Message message = new Message();
+                    message.what = 0;
                     message.getData().putString("update", object.toString());
                     checkHandler.sendMessage(message);
+                    return;
                 }
+                checkHandler.sendEmptyMessage(1);
             } catch (Exception e) {
-                Toast.makeText(getActivity(), "更新检测失败...", Toast.LENGTH_SHORT).show();
+                checkHandler.sendEmptyMessage(2);
             }
         }).start();
     }

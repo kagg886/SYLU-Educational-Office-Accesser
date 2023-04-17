@@ -14,7 +14,6 @@ import com.alibaba.fastjson.JSON;
 import com.kagg886.jxw_collector.protocol.beans.ClassTable;
 import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.adapter.ClassTableAdapter;
-import com.qlstudio.lite_kagg886.widget.GridItemDecoration;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
@@ -66,7 +65,7 @@ public class ClassPerWeekFragment extends Fragment {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.fragment_classperweek, null);
         contain = v.findViewById(R.id.fragment_classperweek_container);
         contain.setLayoutManager(new GridLayoutManager(getContext(), 8)); //一周七天，外加一个显示第几节课的View，所以是8
-        contain.addItemDecoration(new GridItemDecoration(GridLayoutManager.VERTICAL));
+        //contain.addItemDecoration(new GridItemDecoration(GridLayoutManager.VERTICAL));
 
         adapter = new ClassTableAdapter();
         adapter.setDate(startTime);

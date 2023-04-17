@@ -1,6 +1,7 @@
 package com.qlstudio.lite_kagg886.adapter;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +73,10 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         if (position >= 1 && position <= 7) {
             holder.name.setText("星期" + position);
             holder.room.setText(date.toString());
+            holder.rootView.setBackgroundColor(Color.rgb(189, 195, 199));
+            if (date.equals(LocalDate.now())) {
+                holder.rootView.setBackgroundColor(Color.rgb(127, 140, 141));
+            }
             date = date.plusDays(1);
             return;
         }
@@ -102,6 +107,9 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         }
         holder.name.setText(u.getName());
         holder.room.setText(u.getRoom());
+        if (u != ClassTable.ClassUnit.EMPTY) {
+            holder.rootView.setBackgroundColor(Color.argb(60, (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
+        }
     }
 
     @Override
@@ -113,10 +121,13 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         private final TextView name;
         private final TextView room;
 
+        private final View rootView;
+
         public TableUnit(@NonNull @NotNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.adapter_classunit_class);
             room = itemView.findViewById(R.id.adapter_classunit_room);
+            rootView = itemView.findViewById(R.id.adapter_root_view);
         }
     }
 }

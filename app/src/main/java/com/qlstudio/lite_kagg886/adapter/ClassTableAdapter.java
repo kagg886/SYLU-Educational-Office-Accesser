@@ -84,6 +84,7 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         }
         if (u == ClassTable.ClassUnit.EMPTY) {
             holder.name.setText(""); //得加个占位，不然有课程表错位bug
+            holder.room.setText("");
             return;
         }
         holder.name.setText(u.getName());

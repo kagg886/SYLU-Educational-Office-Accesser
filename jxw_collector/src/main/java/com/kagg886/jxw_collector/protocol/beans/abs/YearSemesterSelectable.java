@@ -34,19 +34,23 @@ public abstract class YearSemesterSelectable {
                 .url(url)
                 .get();
         Document document = Jsoup.parse(resp.body());
-        for (Element e : Objects.requireNonNull(document.getElementById("xnm")).getElementsByTag("option")) {
+        try {
+            for (Element e : Objects.requireNonNull(document.getElementById("xnm")).getElementsByTag("option")) {
 
-            if (e.attr("selected").equals("selected")) {
-                defaultYears = e.text();
+                if (e.attr("selected").equals("selected")) {
+                    defaultYears = e.text();
+                }
+                years.put(e.text(), e.attr("value"));
             }
-            years.put(e.text(), e.attr("value"));
-        }
 
-        for (Element e : Objects.requireNonNull(document.getElementById("xqm")).getElementsByTag("option")) {
-            if (!e.attr("selected").equals("")) {
-                defaultTeamVal = e.text();
+            for (Element e : Objects.requireNonNull(document.getElementById("xqm")).getElementsByTag("option")) {
+                if (!e.attr("selected").equals("")) {
+                    defaultTeamVal = e.text();
+                }
+                teamVal.put(e.text(), e.attr("value"));
             }
-            teamVal.put(e.text(), e.attr("value"));
+        } catch (NullPointerException e) {
+            throw new RuntimeException(String.format("解析返回内容失败!\nURL:%s\nBody:%s", url, resp.body()));
         }
     }
 

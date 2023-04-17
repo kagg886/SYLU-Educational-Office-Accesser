@@ -17,6 +17,8 @@ import com.qlstudio.lite_kagg886.adapter.ClassTableAdapter;
 import com.qlstudio.lite_kagg886.widget.GridItemDecoration;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDate;
+
 /**
  * @projectName: 掌上沈理青春版
  * @package: com.qlstudio.lite_kagg886.fragment
@@ -32,12 +34,15 @@ public class ClassPerWeekFragment extends Fragment {
     private RecyclerView contain;
     private ClassTableAdapter adapter;
 
+    private LocalDate startTime;
+
     public ClassPerWeekFragment() {
         //必须提供此构造函数，否则旋转屏幕时Activity重载会导致Fragment不能被正确初始化
     }
 
-    public ClassPerWeekFragment(ClassTable t) {
+    public ClassPerWeekFragment(ClassTable t, LocalDate startTime) {
         this.perWeek = t;
+        this.startTime = startTime;
     }
 
     @Override
@@ -64,6 +69,7 @@ public class ClassPerWeekFragment extends Fragment {
         contain.addItemDecoration(new GridItemDecoration(GridLayoutManager.VERTICAL));
 
         adapter = new ClassTableAdapter();
+        adapter.setDate(startTime);
         for (int i = 0; i <= 7; i++) {
             adapter.getList().add(ClassTable.ClassUnit.EMPTY); //显示星期几用的
         }

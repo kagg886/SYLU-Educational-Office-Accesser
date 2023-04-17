@@ -21,6 +21,8 @@ import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.adapter.ContentPagerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDate;
+
 /**
  * @projectName: 掌上沈理青春版
  * @package: com.qlstudio.lite_kagg886.fragment
@@ -55,26 +57,32 @@ public class ClassFragment extends Fragment {
         });
 
         new Thread(() -> {
-            Schedule schedule = GlobalApplication.getApplicationNoStatic().getSession().getSchedule();
+            Schedule schedule;
+            SchoolCalendar calendar;
+
             ClassTable table;
             try {
+                schedule = GlobalApplication.getApplicationNoStatic().getSession().getSchedule();
                 table = schedule.queryClassByYearAndTerm(schedule.getDefaultYears(), schedule.getDefaultTeamVal());
+                calendar = GlobalApplication.getApplicationNoStatic().getSession().getSchoolCalendar();
             } catch (OfflineException e) {
                 GlobalApplication.getApplicationNoStatic().logout();
                 return;
             }
             int a = 0;
             ClassTable perWeek;
+            LocalDate date = calendar.getStart();
             while ((perWeek = table.queryClassByWeek(a + 1)).size() != 0) {
                 final ClassTable perWeek0 = perWeek;
-                new Handler(Looper.getMainLooper()).post(() ->
-                        adapter.getData().add(new ClassPerWeekFragment(perWeek0))
-                );
+                final LocalDate date0 = date;
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    adapter.getData().add(new ClassPerWeekFragment(perWeek0, date0));
+                });
                 a++;
+                date = date.plusDays(7);
 //                break; //仅仅拿第一周做测试，
             }
             //设置到正确的周数
-            SchoolCalendar calendar = GlobalApplication.getApplicationNoStatic().getSession().getSchoolCalendar();
 
             new Handler(Looper.getMainLooper()).post(() -> {
                 pager2.setCurrentItem(calendar.getWeekFromStart() - 1, false); //防止一瞬间滑动n次造成的卡顿

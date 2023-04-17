@@ -11,6 +11,7 @@ import com.kagg886.jxw_collector.protocol.beans.ClassTable;
 import com.qlstudio.lite_kagg886.R;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +35,14 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         }
     };
 
+    private LocalDate date;
+
     public List<ClassTable.ClassUnit> getList() {
         return list;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     @NonNull
@@ -53,8 +60,19 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         //8 9 10 11 12 13 14 15
         //a mod 8 = 0的是头元素，要丢入时间View
         ClassTable.ClassUnit u = list.get(position);
+
+        if (u == ClassTable.ClassUnit.EMPTY) {
+            holder.name.setText(""); //得加个占位，不然有课程表错位bug
+            holder.room.setText("");
+        }
+
+        if (position == 0) {
+            return;
+        }
         if (position >= 1 && position <= 7) {
             holder.name.setText("星期" + position);
+            holder.room.setText(date.toString());
+            date = date.plusDays(1);
             return;
         }
         if (position % 8 == 0) {
@@ -80,11 +98,6 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
                     holder.room.setText("19:00-19:45\n\n19:55-20:30");
                     break;
             }
-            return;
-        }
-        if (u == ClassTable.ClassUnit.EMPTY) {
-            holder.name.setText(""); //得加个占位，不然有课程表错位bug
-            holder.room.setText("");
             return;
         }
         holder.name.setText(u.getName());

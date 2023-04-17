@@ -28,20 +28,25 @@ public class SchoolCalendar {
         Connection.Response resp = session.getClient().url(session.compile("/xtgl/index_cxAreaSix.html?localeKey=zh_CN&gnmkdm=index&su=", session.getStuCode()))
                 .post();
         Document document = Jsoup.parse(resp.body());
-        String source = document.getElementsByAttributeValue("colspan", "24").get(0).text();
-        terms = Integer.parseInt(source.split("学年")[1].split("学期")[0]);
+        try {
+            String source = document.getElementsByAttributeValue("colspan", "24").get(0).text();
 
-        int l, r;
-        l = source.indexOf("(");
-        r = source.indexOf(")");
-        source = source.substring(l + 1, r);
-        String[] se = source.split("至");
+            terms = Integer.parseInt(source.split("学年")[1].split("学期")[0]);
 
-        String[] starts = se[0].split("-");
-        start = LocalDate.of(Integer.parseInt(starts[0]), Integer.parseInt(starts[1]), Integer.parseInt(starts[2]));
+            int l, r;
+            l = source.indexOf("(");
+            r = source.indexOf(")");
+            source = source.substring(l + 1, r);
+            String[] se = source.split("至");
 
-        starts = se[1].split("-");
-        end = LocalDate.of(Integer.parseInt(starts[0]), Integer.parseInt(starts[1]), Integer.parseInt(starts[2]));
+            String[] starts = se[0].split("-");
+            start = LocalDate.of(Integer.parseInt(starts[0]), Integer.parseInt(starts[1]), Integer.parseInt(starts[2]));
+
+            starts = se[1].split("-");
+            end = LocalDate.of(Integer.parseInt(starts[0]), Integer.parseInt(starts[1]), Integer.parseInt(starts[2]));
+        } catch (Exception e) {
+            throw new RuntimeException("解析学年信息失败!\n源信息:" + resp.body());
+        }
     }
 
     public LocalDate getStart() {

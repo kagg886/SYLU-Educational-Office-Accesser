@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
+import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.qlstudio.lite_kagg886.activity.ErrorActivity;
 import com.qlstudio.lite_kagg886.activity.LoginActivity;
@@ -57,6 +58,9 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
     }
 
     public SyluSession getSession() {
+        if (session == null) {
+            throw new OfflineException("登录实例已丢失，请重新登录");
+        }
         return session;
     }
 
@@ -135,6 +139,7 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
     }
 
     private void goCrash(Throwable th) {
+        Log.e("WRONG", "CRASH!", th);
         new Thread(() -> {
             Intent i = new Intent(getApplicationContext(), ErrorActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?

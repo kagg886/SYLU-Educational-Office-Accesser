@@ -102,44 +102,30 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
         //教室:A-306
         //周数:1-16周
         //节数:1-2
-        private final String name;
-        private final String teacher;
-        private final String room;
-        private final String weekEachLesson;
+        private String name;
+        private String teacher;
+        private String room;
 
-        private final String lesson;
-        private final int dayInWeek;
+        private String lesson;
+        private int dayInWeek;
+
+        private List<Range> weekAsMinMax;
+
+
+        public ClassUnit() {
+
+        }
 
         private ClassUnit(String name, String teacher, String room, String weekEachLesson, String lesson, String dayInWeek) {
+            if (name == null) {
+                return;
+            }
             this.name = name;
             this.teacher = teacher;
             this.room = room;
-            this.weekEachLesson = weekEachLesson;
             this.lesson = lesson;
             this.dayInWeek = Integer.parseInt(dayInWeek);
-        }
 
-        public int getDayInWeek() {
-            return dayInWeek;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getTeacher() {
-            return teacher;
-        }
-
-        public String getRoom() {
-            return room;
-        }
-
-        public String getWeekEachLesson() {
-            return weekEachLesson;
-        }
-
-        public List<Range> getWeekAsMinMax() { //列表中每个数组代表起止
             List<Range> rtn = new ArrayList<>();
             for (String a : weekEachLesson.split(",")) {
                 a = a.substring(0, a.length() - 1);
@@ -161,9 +147,52 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
                 }
                 rtn.add(new Range(Integer.parseInt(a), Integer.parseInt(a), FilterType.ALL));
             }
-            return rtn;
+            this.weekAsMinMax = rtn;
         }
 
+        public int getDayInWeek() {
+            return dayInWeek;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getTeacher() {
+            return teacher;
+        }
+
+        public String getRoom() {
+            return room;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setTeacher(String teacher) {
+            this.teacher = teacher;
+        }
+
+        public void setRoom(String room) {
+            this.room = room;
+        }
+
+        public void setLesson(String lesson) {
+            this.lesson = lesson;
+        }
+
+        public void setDayInWeek(int dayInWeek) {
+            this.dayInWeek = dayInWeek;
+        }
+
+        public List<Range> getWeekAsMinMax() { //列表中每个数组代表起止
+            return weekAsMinMax;
+        }
+
+        public void setWeekAsMinMax(List<Range> weekAsMinMax) {
+            this.weekAsMinMax = weekAsMinMax;
+        }
 
         public String getLesson() {
             return lesson;
@@ -175,7 +204,7 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
                     .add("name='" + name + "'")
                     .add("teacher='" + teacher + "'")
                     .add("room='" + room + "'")
-                    .add("weekEachLesson='" + weekEachLesson + "'")
+                    .add("weekEachLesson='" + weekAsMinMax + "'")
                     .add("lesson='" + lesson + "'")
                     .add("dayInWeek=" + dayInWeek)
                     .toString();
@@ -183,13 +212,29 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
     }
 
     public static class Range {
-        private final int start;
-        private final int end;
-        private final FilterType type;
+        private int start;
+        private int end;
+        private FilterType type;
 
         public Range(int start, int end, FilterType type) {
             this.start = start;
             this.end = end;
+            this.type = type;
+        }
+
+        public Range() {
+
+        }
+
+        public void setStart(int start) {
+            this.start = start;
+        }
+
+        public void setEnd(int end) {
+            this.end = end;
+        }
+
+        public void setType(FilterType type) {
             this.type = type;
         }
 

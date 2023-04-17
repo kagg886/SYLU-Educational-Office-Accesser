@@ -44,7 +44,7 @@ public class ClassFragment extends Fragment {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.fragment_classinfo, null);
         pager2 = v.findViewById(R.id.fragment_classinfo_container);
         textView = v.findViewById(R.id.fragment_classinfo_counter);
-        adapter = new ContentPagerAdapter(getActivity());
+        adapter = new ContentPagerAdapter(getChildFragmentManager(), getLifecycle());
         pager2.setAdapter(adapter);
         pager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @SuppressLint("SetTextI18n")
@@ -75,7 +75,6 @@ public class ClassFragment extends Fragment {
             }
             //设置到正确的周数
             SchoolCalendar calendar = GlobalApplication.getApplicationNoStatic().getSession().getSchoolCalendar();
-
 
             new Handler(Looper.getMainLooper()).post(() -> {
                 pager2.setCurrentItem(calendar.getWeekFromStart() - 1, false); //防止一瞬间滑动n次造成的卡顿

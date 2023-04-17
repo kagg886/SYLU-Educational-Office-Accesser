@@ -24,6 +24,10 @@ public class HttpClient {
     private final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(15); //异步线程池
 
 
+    public String getCookie() {
+        return connection.request().header("Cookie");
+    }
+
     public synchronized Connection.Response get() {
         try {
             return connection.method(Connection.Method.GET).execute();

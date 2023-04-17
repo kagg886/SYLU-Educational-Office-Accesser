@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.alibaba.fastjson.JSON;
 import com.kagg886.jxw_collector.protocol.beans.ClassTable;
 import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.adapter.ClassTableAdapter;
@@ -27,12 +28,30 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ClassPerWeekFragment extends Fragment {
 
-    private final ClassTable perWeek; //每周的课表对象
+    private ClassTable perWeek; //每周的课表对象
     private RecyclerView contain;
     private ClassTableAdapter adapter;
 
+    public ClassPerWeekFragment() {
+        //必须提供此构造函数，否则旋转屏幕时Activity重载会导致Fragment不能被正确初始化
+    }
+
     public ClassPerWeekFragment(ClassTable t) {
         this.perWeek = t;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("list", JSON.toJSONString(perWeek));
+    }
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            this.perWeek = JSON.parseObject(savedInstanceState.getString("list"), ClassTable.class);
+        }
     }
 
     @Nullable

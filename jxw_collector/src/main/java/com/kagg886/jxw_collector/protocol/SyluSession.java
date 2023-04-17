@@ -149,7 +149,6 @@ public class SyluSession {
     }
 
     public void assertLogin() {
-
         if (!isLogin()) {
             throw new OfflineException("登录状态为未登录或踢下线");
         }

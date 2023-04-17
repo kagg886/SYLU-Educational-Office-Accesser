@@ -3,7 +3,6 @@ package com.qlstudio.lite_kagg886.activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.*;
-import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what) {
                 case 0:
                     NavigationView navigationView = binding.navView;
-                    if (!TextUtils.isEmpty(msg.getData().getString("img"))) {
+                    if (msg.getData().containsKey("img")) {
                         ImageView img = navigationView.findViewById(R.id.nav_header_img);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             img.setImageBitmap(msg.getData().getParcelable("img", Bitmap.class));

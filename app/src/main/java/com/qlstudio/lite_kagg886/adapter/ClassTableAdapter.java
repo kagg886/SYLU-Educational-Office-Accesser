@@ -45,6 +45,7 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         return new TableUnit(LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_classunit, null));
     }
 
+
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull @NotNull TableUnit holder, int position) {
@@ -52,18 +53,37 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         //8 9 10 11 12 13 14 15
         //a mod 8 = 0的是头元素，要丢入时间View
         ClassTable.ClassUnit u = list.get(position);
-        if (position >= 0 && position <= 7) {
-            if (position == 0) {
-                return;
-            }
+        if (position >= 1 && position <= 7) {
             holder.name.setText("星期" + position);
+            return;
         }
         if (position % 8 == 0) {
-            holder.name.setText("第" + (position / 8) + "节");
-            holder.room.setText("10:00");
+            int k = (position / 8);
+            holder.name.setText("第" + k + "节");
+            switch (k) {
+                case 1: //1-2
+                    holder.room.setText("8:00-8:45\n\n8:55-9:40");
+                    break;
+                case 2://3-4
+                    holder.room.setText("10:00-10:45\n\n10:55-11:40");
+                    break;
+                case 3://5-6
+                    holder.room.setText("13:00-13:45\n\n13:55-14:40");
+                    break;
+                case 4://7-8
+                    holder.room.setText("14:50-15:35\n\n15:45-16:30");
+                    break;
+                case 5://9-10
+                    holder.room.setText("16:40-17:25\n\n17:35-18:20");
+                    break;
+                case 6://11-12
+                    holder.room.setText("19:00-19:45\n\n19:55-20:30");
+                    break;
+            }
             return;
         }
         if (u == ClassTable.ClassUnit.EMPTY) {
+            holder.name.setText(""); //得加个占位，不然有课程表错位bug
             return;
         }
         holder.name.setText(u.getName());

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import com.kagg886.jxw_collector.protocol.beans.ClassTable;
 import com.qlstudio.lite_kagg886.R;
@@ -110,6 +111,15 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         if (u != ClassTable.ClassUnit.EMPTY) {
             holder.rootView.setBackgroundColor(Color.argb(60, (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
         }
+        holder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setTitle(u.getName() + "的详细信息");
+                builder.setMessage(String.format("节数:%s\n教室:%s\n老师:%s\n上课时间:%s", u.getLesson(), u.getRoom(), u.getTeacher(), u.getWeekEachLesson()));
+                builder.create().show();
+            }
+        });
     }
 
     @Override

@@ -111,6 +111,8 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
 
         private List<Range> weekAsMinMax;
 
+        private String weekEachLesson;
+
 
         public ClassUnit() {
 
@@ -125,6 +127,7 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
             this.room = room;
             this.lesson = lesson;
             this.dayInWeek = Integer.parseInt(dayInWeek);
+            this.weekEachLesson = weekEachLesson;
 
             List<Range> rtn = new ArrayList<>();
             for (String a : weekEachLesson.split(",")) {
@@ -148,6 +151,14 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
                 rtn.add(new Range(Integer.parseInt(a), Integer.parseInt(a), FilterType.ALL));
             }
             this.weekAsMinMax = rtn;
+        }
+
+        public String getWeekEachLesson() {
+            return weekEachLesson;
+        }
+
+        public void setWeekEachLesson(String weekEachLesson) {
+            this.weekEachLesson = weekEachLesson;
         }
 
         public int getDayInWeek() {
@@ -198,15 +209,17 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
             return lesson;
         }
 
+
         @Override
         public String toString() {
             return new StringJoiner(", ", ClassUnit.class.getSimpleName() + "[", "]")
                     .add("name='" + name + "'")
                     .add("teacher='" + teacher + "'")
                     .add("room='" + room + "'")
-                    .add("weekEachLesson='" + weekAsMinMax + "'")
                     .add("lesson='" + lesson + "'")
                     .add("dayInWeek=" + dayInWeek)
+                    .add("weekAsMinMax=" + weekAsMinMax)
+                    .add("weekEachLesson='" + weekEachLesson + "'")
                     .toString();
         }
     }

@@ -110,16 +110,13 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         holder.room.setText(u.getRoom());
         if (u != ClassTable.ClassUnit.EMPTY) {
             holder.rootView.setBackgroundColor(Color.argb(60, (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
-        }
-        holder.rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            holder.rootView.setOnClickListener(v -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle(u.getName() + "的详细信息");
                 builder.setMessage(String.format("节数:%s\n教室:%s\n老师:%s\n上课时间:%s", u.getLesson(), u.getRoom(), u.getTeacher(), u.getWeekEachLesson()));
                 builder.create().show();
-            }
-        });
+            });
+        }
     }
 
     @Override

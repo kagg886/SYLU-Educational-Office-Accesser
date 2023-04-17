@@ -9,6 +9,11 @@
             android:title="侧滑栏显示头像"
             android:key="setting_show_avatar"/>
     <PreferenceCategory
-            app:title="@string/setting_debug"/>
+            app:title="@string/setting_debug">
+        <SwitchPreference
+                android:defaultValue="false"
+                android:title="为课程表布局添加边界线"
+                android:key="setting_show_line"/>
+    </PreferenceCategory>
 
 </PreferenceScreen>

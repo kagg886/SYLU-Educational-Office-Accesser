@@ -16,6 +16,7 @@ import org.jsoup.nodes.Element;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.StringJoiner;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -152,5 +153,13 @@ public class SyluSession {
         if (!isLogin()) {
             throw new OfflineException("登录状态为未登录或踢下线");
         }
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", SyluSession.class.getSimpleName() + "[", "]")
+                .add("client=" + client)
+                .add("user='" + user + "'")
+                .toString();
     }
 }

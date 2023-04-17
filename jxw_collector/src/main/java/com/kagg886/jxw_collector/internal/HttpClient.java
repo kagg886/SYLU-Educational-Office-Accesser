@@ -74,13 +74,24 @@ public class HttpClient {
         return this;
     }
 
-    public HttpClient data(String k,String v) {
-        connection.data(k,v);
+    public HttpClient data(String k, String v) {
+        connection.data(k, v);
         return this;
     }
 
-    public HttpClient header(String k,String v) { //不能Clear Header，因为cookie在header里
-        connection.header(k,v);
+    public HttpClient header(String k, String v) { //不能Clear Header，因为cookie在header里
+        connection.header(k, v);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("HttpClient{");
+        sb.append("connection=")
+                .append("{url=").append(connection.request().url()).append("}")
+                .append("{headers=").append(connection.request().headers()).append("}")
+                .append("{data=").append(connection.request().data()).append("}")
+                .append('}');
+        return sb.toString();
     }
 }

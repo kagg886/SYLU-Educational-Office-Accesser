@@ -1,0 +1,14 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+            app:title="@string/setting_beautiful"/>
+
+    <SwitchPreference
+            android:defaultValue="true"
+            android:title="侧滑栏显示头像"
+            android:key="setting_show_avatar"/>
+    <PreferenceCategory
+            app:title="@string/setting_debug"/>
+
+</PreferenceScreen>

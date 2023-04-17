@@ -3,7 +3,7 @@ package com.qlstudio.lite_kagg886.activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.*;
-import android.view.KeyEvent;
+import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -32,11 +32,13 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what) {
                 case 0:
                     NavigationView navigationView = binding.navView;
-                    ImageView img = navigationView.findViewById(R.id.nav_header_img);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        img.setImageBitmap(msg.getData().getParcelable("img", Bitmap.class));
-                    } else {
-                        img.setImageBitmap(msg.getData().getParcelable("img"));
+                    if (!TextUtils.isEmpty(msg.getData().getString("img"))) {
+                        ImageView img = navigationView.findViewById(R.id.nav_header_img);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            img.setImageBitmap(msg.getData().getParcelable("img", Bitmap.class));
+                        } else {
+                            img.setImageBitmap(msg.getData().getParcelable("img"));
+                        }
                     }
                     TextView name = navigationView.findViewById(R.id.nav_header_title);
                     name.setText(msg.getData().getString("userName"));
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +73,9 @@ public class MainActivity extends AppCompatActivity {
                     info = session.getUserInfo();
                     Message message = new Message();
                     message.what = 0;
-                    message.getData().putParcelable("img", BitmapFactory.decodeStream(session.getClient().url(info.getAvatar()).get().bodyStream()));
+                    if (GlobalApplication.getApplicationNoStatic().getPreferences().getBoolean("setting_show_avatar", true)) {
+                        message.getData().putParcelable("img", BitmapFactory.decodeStream(session.getClient().url(info.getAvatar()).get().bodyStream()));
+                    }
                     message.getData().putString("userName", info.getName());
                     message.getData().putString("college", info.getCollege());
                     handler.sendMessage(message);
@@ -104,11 +109,5 @@ public class MainActivity extends AppCompatActivity {
         });
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        finish();
-        return true;
     }
 }

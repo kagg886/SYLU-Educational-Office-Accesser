@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
 
+        GlobalApplication.getApplicationNoStatic().getPreferences().edit()
+                .putBoolean("setting_nullfail", false)
+                .apply();
 
         new Thread(() -> {
             SyluSession session = GlobalApplication.getApplicationNoStatic().getSession();

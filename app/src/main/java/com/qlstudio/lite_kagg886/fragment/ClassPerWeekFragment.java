@@ -66,7 +66,9 @@ public class ClassPerWeekFragment extends Fragment {
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.fragment_classperweek, null);
         contain = v.findViewById(R.id.fragment_classperweek_container);
-        contain.setLayoutManager(new GridLayoutManager(getContext(), 8)); //一周七天，外加一个显示第几节课的View，所以是8
+        GridLayoutManager manager = new GridLayoutManager(getContext(), 8); //一周七天，外加一个显示第几节课的View，所以是8
+
+        contain.setLayoutManager(manager);
         if (GlobalApplication.getApplicationNoStatic().getPreferences().getBoolean("setting_show_line", false)) {
             contain.addItemDecoration(new GridItemDecoration(GridLayoutManager.VERTICAL));
         }

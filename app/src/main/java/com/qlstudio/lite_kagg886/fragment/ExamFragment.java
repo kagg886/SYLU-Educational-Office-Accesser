@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -140,6 +141,9 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
                         choose_year.getSelectedItem().toString(),
                         choose_term.getSelectedItem().toString()
                 );
+                if (GlobalApplication.getApplicationNoStatic().getPreferences().getBoolean("setting_nullfail", false)) {
+                    info = info.stream().filter((v) -> v.getStatus() != ExamResult.Status.FUCK_TEACHER).collect(Collectors.toList());
+                }
             } catch (OfflineException e) {
                 dialogController.sendEmptyMessage(2);
                 return;

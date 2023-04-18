@@ -7,7 +7,9 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,6 +24,8 @@ import com.qlstudio.lite_kagg886.adapter.ContentPagerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -37,7 +41,9 @@ public class ClassFragment extends Fragment {
     private ViewPager2 pager2; //每周的课程表Fragment用此实现
     private ContentPagerAdapter adapter;
 
-    private TextView textView;
+    private Spinner spinner;
+
+    private boolean isDrag; //判断是否为用户滑动
 
     @Nullable
     @org.jetbrains.annotations.Nullable
@@ -45,14 +51,23 @@ public class ClassFragment extends Fragment {
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.fragment_classinfo, null);
         pager2 = v.findViewById(R.id.fragment_classinfo_container);
-        textView = v.findViewById(R.id.fragment_classinfo_counter);
+        spinner = v.findViewById(R.id.fragment_classinfo_counter);
         adapter = new ContentPagerAdapter(getChildFragmentManager(), getLifecycle());
         pager2.setAdapter(adapter);
+
         pager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+
             @SuppressLint("SetTextI18n")
             @Override
             public void onPageSelected(int position) {
-                textView.setText("第" + (position + 1) + "周");
+                spinner.setSelection(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager2.SCROLL_STATE_DRAGGING) {
+                    isDrag = true;
+                }
             }
         });
 
@@ -84,10 +99,32 @@ public class ClassFragment extends Fragment {
             }
             //设置到正确的周数
 
+            final int len = a;
             new Handler(Looper.getMainLooper()).post(() -> {
+                List<String> titles = new ArrayList<>();
+                for (int i = 0; i < len; i++) {
+                    titles.add("第" + (i + 1) + "周");
+                }
+                spinner.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, titles.toArray()));
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (!isDrag) { //如果是代码操作则切换pager，否则由recycler自行完成
+                            pager2.setCurrentItem(position, false);
+                        }
+                        isDrag = false;
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
                 pager2.setCurrentItem(calendar.getWeekFromStart() - 1, false); //防止一瞬间滑动n次造成的卡顿
             });
         }).start();
         return v;
     }
+
 }

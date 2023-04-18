@@ -35,6 +35,13 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
             notifyItemInserted(size());
             return a;
         }
+
+        @Override
+        public ClassTable.ClassUnit remove(int index) {
+            ClassTable.ClassUnit a = super.remove(index);
+            notifyItemRemoved(index);
+            return a;
+        }
     };
 
     private LocalDate date;

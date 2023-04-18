@@ -5,7 +5,7 @@
               android:gravity="top|center"
               android:layout_height="match_parent">
 
-    <TextView
+    <Spinner
             android:text="@string/demo"
             android:textSize="20sp"
             android:layout_width="wrap_content"

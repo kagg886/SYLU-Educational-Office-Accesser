@@ -26,7 +26,7 @@ import java.util.List;
  * @date: 2023/4/16 14:49
  * @version: 1.0
  */
-public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.TableUnit> {
+public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.TableUnit> implements View.OnClickListener {
 
     private final List<ClassTable.ClassUnit> list = new ArrayList<ClassTable.ClassUnit>() {
         @Override
@@ -78,6 +78,7 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         if (position == 0) {
             return;
         }
+
         if (position >= 1 && position <= 7) {
             holder.name.setText("星期" + position);
             holder.room.setText(date.toString());
@@ -117,18 +118,23 @@ public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.Ta
         holder.room.setText(u.getRoom());
         if (u != ClassTable.ClassUnit.EMPTY) {
             holder.rootView.setBackgroundColor(Color.argb(60, (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255)));
-            holder.rootView.setOnClickListener(v -> {
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setTitle(u.getName() + "的详细信息");
-                builder.setMessage(String.format("节数:%s\n教室:%s\n老师:%s\n上课时间:%s", u.getLesson(), u.getRoom(), u.getTeacher(), u.getWeekEachLesson()));
-                builder.create().show();
-            });
+            holder.rootView.setTag(u);
+            holder.rootView.setOnClickListener(this); //复用布局...
         }
     }
 
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    @Override
+    public void onClick(View view) {
+        ClassTable.ClassUnit u = (ClassTable.ClassUnit) view.getTag();
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle(u.getName() + "的详细信息");
+        builder.setMessage(String.format("节数:%s\n教室:%s\n老师:%s\n上课时间:%s", u.getLesson(), u.getRoom(), u.getTeacher(), u.getWeekEachLesson()));
+        builder.create().show();
     }
 
     public static class TableUnit extends RecyclerView.ViewHolder {

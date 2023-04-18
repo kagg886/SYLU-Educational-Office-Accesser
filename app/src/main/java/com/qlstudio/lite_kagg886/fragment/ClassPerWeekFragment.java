@@ -37,6 +37,8 @@ public class ClassPerWeekFragment extends Fragment {
 
     private LocalDate startTime;
 
+    private static final RecyclerView.RecycledViewPool pool = new RecyclerView.RecycledViewPool();
+
     public ClassPerWeekFragment() {
         //必须提供此构造函数，否则旋转屏幕时Activity重载会导致Fragment不能被正确初始化
     }
@@ -66,6 +68,7 @@ public class ClassPerWeekFragment extends Fragment {
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.fragment_classperweek, null);
         contain = v.findViewById(R.id.fragment_classperweek_container);
+        contain.setRecycledViewPool(pool); //复用Pool缓存池，提高加载效率
         GridLayoutManager manager = new GridLayoutManager(getContext(), 8); //一周七天，外加一个显示第几节课的View，所以是8
 
         contain.setLayoutManager(manager);

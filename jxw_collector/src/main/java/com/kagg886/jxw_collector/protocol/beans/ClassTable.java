@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.protocol.SyluSession;
+import com.kagg886.jxw_collector.util.ExceptionUtil;
 import org.jsoup.Connection;
 
 import java.util.ArrayList;
@@ -32,14 +33,15 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
     }
 
     public ClassTable(String xnm, String xqm, SyluSession session) {
-        session.assertLogin();
-        HttpClient client = session.getClient();
-        client.url(session.compile("/kbcx/xskbcx_cxXsgrkb.html?gnmkdm=ssss&su=" + session.getStuCode()))
-                .data("xnm", xnm).data("xqm", xqm)
-                .data("kzlx", "ck").data("xsdm", "");
-        Connection.Response resp = client.post();
-
-        JSONArray array = JSON.parseObject(resp.body()).getJSONArray("kbList");
+        JSONArray array = ExceptionUtil.executeUntilNoException(() -> {
+            session.assertLogin();
+            HttpClient client = session.getClient();
+            client.url(session.compile("/kbcx/xskbcx_cxXsgrkb.html?gnmkdm=ssss&su=" + session.getStuCode()))
+                    .data("xnm", xnm).data("xqm", xqm)
+                    .data("kzlx", "ck").data("xsdm", "");
+            Connection.Response resp = client.post();
+            return JSON.parseObject(resp.body()).getJSONArray("kbList");
+        }, 30000);
         array.forEach((obj) -> {
             JSONObject object = ((JSONObject) obj);
             String room = object.getString("cdmc");

@@ -1,6 +1,7 @@
 package com.kagg886.jxw_collector.protocol.beans;
 
 import com.kagg886.jxw_collector.protocol.SyluSession;
+import com.kagg886.jxw_collector.util.ExceptionUtil;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -24,12 +25,13 @@ public class SchoolCalendar {
 
 
     public SchoolCalendar(SyluSession session) {
-        session.assertLogin();
-        Connection.Response resp = session.getClient().url(session.compile("/xtgl/index_cxAreaSix.html?localeKey=zh_CN&gnmkdm=index&su=", session.getStuCode()))
-                .post();
-        Document document = Jsoup.parse(resp.body());
-        String source = document.getElementsByAttributeValue("colspan", "24").get(0).text();
-
+        String source = ExceptionUtil.executeUntilNoException(() -> {
+            session.assertLogin();
+            Connection.Response resp = session.getClient().url(session.compile("/xtgl/index_cxAreaSix.html?localeKey=zh_CN&gnmkdm=index&su=", session.getStuCode()))
+                    .post();
+            Document document = Jsoup.parse(resp.body());
+            return document.getElementsByAttributeValue("colspan", "24").get(0).text();
+        }, 20000);
         terms = Integer.parseInt(source.split("学年")[1].split("学期")[0]);
 
         int l, r;

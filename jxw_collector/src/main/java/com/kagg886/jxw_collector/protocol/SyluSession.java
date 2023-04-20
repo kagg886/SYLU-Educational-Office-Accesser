@@ -5,18 +5,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.internal.RSA;
-import com.kagg886.jxw_collector.protocol.beans.ExamResult;
-import com.kagg886.jxw_collector.protocol.beans.Schedule;
-import com.kagg886.jxw_collector.protocol.beans.SchoolCalendar;
-import com.kagg886.jxw_collector.protocol.beans.UserInfo;
+import com.kagg886.jxw_collector.protocol.beans.*;
+import com.kagg886.jxw_collector.util.ExceptionUtil;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -39,6 +35,8 @@ public class SyluSession {
     private long stamp; //最近一次检查登录的成果
 
     private boolean isLogin; //最近一次检查登录是否成功
+
+    private int queryCount = 0; //查询评价时的次数
 
     public SyluSession(String user) {
         client = new HttpClient();
@@ -124,6 +122,66 @@ public class SyluSession {
         StringBuilder builder = new StringBuilder(base);
         Arrays.stream(p).forEach(builder::append);
         return builder.toString();
+    }
+
+    public List<TeacherRelate> getRelate() {
+        return ExceptionUtil.executeUntilNoException(() -> {
+            List<TeacherRelate> rtn = new ArrayList<>();
+            Connection.Response resp = getClient()
+                    .url(compile("/xspjgl/xspj_cxXspjIndex.html?doType=query&gnmkdm=N401605&su=", SyluSession.this.getStuCode()))
+                    .clearData()
+                    .data("nd", String.valueOf(System.currentTimeMillis()))
+                    .data("_search", "false")
+                    .data("queryModel.showCount", "5000")
+                    .data("queryModel.currentPage", "1")
+                    .data("queryModel.sortName:", "")
+                    .data("queryModel.sortOrder", "asc")
+                    .data("time", String.valueOf(++this.queryCount)).post();
+            JSON.parseObject(resp.body()).getJSONArray("items").forEach((i) -> {
+                JSONObject obj = (JSONObject) i;
+                //"date":"二○二三年四月二十日",
+                //"dateDigit":"2023年4月20日",
+                //"dateDigitSeparator":"2023-4-20",
+                //"day":"20",
+                //"jgh_id":"71a8f412cb8684718ba4fb699b553d433ce4109d3eebf61f4b277766a6f5afd4ebb9ee03e23b29d1a49cb2647d6ef6e436121f1460ae62485483c20d39736c3ceb8f03bb5bb12f4148e1962a2675fc68b1b3b553d7f68b21fcf2ce81c5cd5b8d0a71e8e2b5e1aebfe1cb17892ef0569bed0fc5f120f052bfb8c106fc58ee5201",
+                //"jgpxzd":"1",
+                //"jxb_id":"E1A0AA89B272BB03E0530100050A8EC9",
+                //"jxbmc":"(2022-2023-1)-211700009-篮球1-1",
+                //"jxdd":"篮球场1",
+                //"jzgmc":"张绍英",
+                //"kch_id":"211700009",
+                //"kcmc":"体育1",
+                //"listnav":"false",
+                //"localeKey":"zh_CN",
+                //"month":"4",
+                //"pageTotal":0,
+                //"pageable":true,
+                //"pjmbmcb_id":"EFEF6F98795A68ECE0530200050A22D0",
+                //"pjzt":"1",
+                //"rangeable":true,
+                //"row_id":"1",
+                //"sfcjlrjs":"1",
+                //"sksj":"星期三第3-4节{6-17周}",
+                //"tjzt":"1",
+                //"tjztmc":"提交",
+                //"totalResult":"23",
+                //"xnm":"2022",
+                //"xqm":"3",
+                //"xsdm":"01",
+                //"xsmc":"讲课学时",
+                //"year":"2023"
+                rtn.add(new TeacherRelate(SyluSession.this,
+                                obj.getString("jxb_id"), obj.getString("kch_id"),
+                                obj.getString("xsdm"), obj.getString("jgh_id"),
+                                obj.getString("pjmbmcb_id"), obj.getString("sfcjlrjs"),
+                                obj.getString("kcmc"), obj.getString("jzgmc"),
+                                Integer.parseInt(obj.getString("pjzt")), Integer.parseInt(obj.getString("tjzt"))
+                        )
+                );
+            });
+
+            return rtn;
+        }, 30000);
     }
 
     public UserInfo getUserInfo() {

@@ -27,6 +27,6 @@ public class ExceptionUtil {
                 }
             }
         }
-        throw new RuntimeException("Method Access Failed!");
+        return null;
     }
 }

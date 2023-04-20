@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.kagg886.jxw_collector.protocol.beans.abs.YearSemesterSelectable;
+import com.kagg886.jxw_collector.util.ExceptionUtil;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -35,31 +36,34 @@ public class ExamResult extends YearSemesterSelectable {
         //xnm: 2022
         //xqm: 12
         //kcmc: 大学外语1
-        Connection.Response resp;
-        resp = session.getClient()
-                .clearData() //防止变量污染
-                .url(session.compile("/cjcx/cjcx_cxCjxqGjh.html?time=", new Date().getTime(), "&gnmkdm=N305005&su=", session.getStuCode()))
-                .data("jxb_id", i.getDetailsID())
-                .data("xnm", i.getYear())
-                .data("xqm", i.getTerm())
-                .data("kcmc", i.getName())
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-                .header("Host", "jxw.sylu.edu.cn")
-                .header("Origin", "https://jxw.sylu.edu.cn")
-                .header("Referer", session.compile("/cjcx/cjcx_cxDgXscj.html?gnmkdm=N305005&layout=default&su=", session.getStuCode()))
-                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.48")
-                .header("X-Requested-With", "XMLHttpRequest")
-                .post();
-        List<List<String>> rtn = new ArrayList<>();
-        Elements tr = Jsoup.parse(resp.body()).getElementsByTag("tr");
-        for (int j = 1; j < tr.size(); j++) {
-            List<String> trs = new ArrayList<>();
-            for (Element td : tr.get(j).getElementsByTag("td")) {
-                trs.add(td.text());
+
+        return ExceptionUtil.executeUntilNoException(() -> {
+            Connection.Response resp;
+            resp = session.getClient()
+                    .clearData() //防止变量污染
+                    .url(session.compile("/cjcx/cjcx_cxCjxqGjh.html?time=", new Date().getTime(), "&gnmkdm=N305005&su=", session.getStuCode()))
+                    .data("jxb_id", i.getDetailsID())
+                    .data("xnm", i.getYear())
+                    .data("xqm", i.getTerm())
+                    .data("kcmc", i.getName())
+                    .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+                    .header("Host", "jxw.sylu.edu.cn")
+                    .header("Origin", "https://jxw.sylu.edu.cn")
+                    .header("Referer", session.compile("/cjcx/cjcx_cxDgXscj.html?gnmkdm=N305005&layout=default&su=", session.getStuCode()))
+                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.48")
+                    .header("X-Requested-With", "XMLHttpRequest")
+                    .post();
+            List<List<String>> rtn = new ArrayList<>();
+            Elements tr = Jsoup.parse(resp.body()).getElementsByTag("tr");
+            for (int j = 1; j < tr.size(); j++) {
+                List<String> trs = new ArrayList<>();
+                for (Element td : tr.get(j).getElementsByTag("td")) {
+                    trs.add(td.text());
+                }
+                rtn.add(trs);
             }
-            rtn.add(trs);
-        }
-        return rtn;
+            return rtn;
+        }, 30000);
     }
 
     public List<ExamInfo> queryResultByYearAndTerm(String year, String term) {

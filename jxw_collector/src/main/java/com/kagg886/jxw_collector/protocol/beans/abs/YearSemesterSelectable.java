@@ -1,6 +1,7 @@
 package com.kagg886.jxw_collector.protocol.beans.abs;
 
 import com.kagg886.jxw_collector.protocol.SyluSession;
+import com.kagg886.jxw_collector.util.ExceptionUtil;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,11 +31,11 @@ public abstract class YearSemesterSelectable {
     public YearSemesterSelectable(SyluSession session, String url) {
         this.session = session;
         session.assertLogin();
-        Connection.Response resp = session.getClient()
-                .url(url)
-                .get();
-        Document document = Jsoup.parse(resp.body());
-        try {
+        ExceptionUtil.executeUntilNoException(() -> {
+            Connection.Response resp = session.getClient()
+                    .url(url)
+                    .get();
+            Document document = Jsoup.parse(resp.body());
             for (Element e : Objects.requireNonNull(document.getElementById("xnm")).getElementsByTag("option")) {
 
                 if (e.attr("selected").equals("selected")) {
@@ -49,9 +50,8 @@ public abstract class YearSemesterSelectable {
                 }
                 teamVal.put(e.text(), e.attr("value"));
             }
-        } catch (NullPointerException e) {
-            throw new RuntimeException(String.format("解析返回内容失败!\nURL:%s\nBody:%s", url, resp.body()));
-        }
+            return null;
+        }, 30000);
     }
 
     public String getDefaultTeamVal() {

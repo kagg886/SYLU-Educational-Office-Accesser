@@ -45,6 +45,15 @@ public class BaseAPITest {
     }
 
     @Test
+    void testBigInnovation() {
+        SyluSession session = new SyluSession("2203050528");
+        session.loginByPwd(pwd);
+        session.getBigInnovations().forEach((K, V) -> {
+            System.out.printf("%s:\n%s\n", K, V.toString());
+        });
+    }
+
+    @Test
     public void testClassTableGet() {
         SyluSession session = new SyluSession("2203050528");
         session.loginByPwd(pwd);

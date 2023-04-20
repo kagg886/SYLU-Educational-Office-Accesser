@@ -22,6 +22,7 @@ public class ExceptionUtil {
             try {
                 return func.get();
             } catch (Exception ignored) {
+                ignored.printStackTrace();
                 if (ignored instanceof OfflineException) {
                     throw ignored;
                 }

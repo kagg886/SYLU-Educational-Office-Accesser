@@ -7,6 +7,7 @@ import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.internal.RSA;
 import com.kagg886.jxw_collector.protocol.beans.*;
 import com.kagg886.jxw_collector.util.ExceptionUtil;
+import com.kagg886.jxw_collector.util.ParamUtil;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -35,8 +36,6 @@ public class SyluSession {
     private long stamp; //最近一次检查登录的成果
 
     private boolean isLogin; //最近一次检查登录是否成功
-
-    private int queryCount = 0; //查询评价时的次数
 
     public SyluSession(String user) {
         client = new HttpClient();
@@ -127,16 +126,9 @@ public class SyluSession {
     public List<TeacherRelate> getRelate() {
         return ExceptionUtil.executeUntilNoException(() -> {
             List<TeacherRelate> rtn = new ArrayList<>();
-            Connection.Response resp = getClient()
+            Connection.Response resp = ParamUtil.addQueryListParam(getClient()
                     .url(compile("/xspjgl/xspj_cxXspjIndex.html?doType=query&gnmkdm=N401605&su=", SyluSession.this.getStuCode()))
-                    .clearData()
-                    .data("nd", String.valueOf(System.currentTimeMillis()))
-                    .data("_search", "false")
-                    .data("queryModel.showCount", "5000")
-                    .data("queryModel.currentPage", "1")
-                    .data("queryModel.sortName:", "")
-                    .data("queryModel.sortOrder", "asc")
-                    .data("time", String.valueOf(++this.queryCount)).post();
+                    .clearData()).post();
             JSON.parseObject(resp.body()).getJSONArray("items").forEach((i) -> {
                 JSONObject obj = (JSONObject) i;
                 //"date":"二○二三年四月二十日",
@@ -182,6 +174,39 @@ public class SyluSession {
 
             return rtn;
         }, 30000);
+    }
+
+    public HashMap<String, BigInnovation> getBigInnovations() {
+        assertLogin();
+        return ExceptionUtil.executeUntilNoException(() -> {
+            HashMap<String, BigInnovation> map = new HashMap<>();
+            Connection.Response resp = ParamUtil.addQueryListParam(client.clearData()
+                    .url(compile("/xmfzgl/xshdfzcx_cxXshdfzcxIndex.html?doType=query&gnmkdm=N4780&su=", getStuCode()))
+            ).post();
+
+            JSON.parseObject(resp.body()).getJSONArray("items").forEach((i) -> {
+                JSONObject object = (JSONObject) i;
+                String name = object.getString("xmlbmc");
+                map.put(name,
+                        ExceptionUtil.executeUntilNoException(
+                                () -> getInnovationByTag(name)
+                                , 30000)
+                );
+            });
+            return map;
+        }, 30000);
+    }
+
+    private BigInnovation getInnovationByTag(String name) {
+        BigInnovation innovation = new BigInnovation();
+        Connection.Response resp = ParamUtil.addQueryListParam(client.url(compile("/xmfzgl/xshdfzcx_cxXmfzqr.html?gnmkdm=N4780&su=", getStuCode())).clearData())
+                .data("xmlbmc", name)
+                .post();
+        JSON.parseObject(resp.body()).getJSONArray("items").forEach((i) -> {
+            JSONObject object = (JSONObject) i;
+            innovation.add(new BigInnovation.Item(object.getString("xmnr"), object.getString("yxfz")));
+        });
+        return innovation;
     }
 
     public UserInfo getUserInfo() {

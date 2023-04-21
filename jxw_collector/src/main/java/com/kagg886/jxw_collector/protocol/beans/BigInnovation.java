@@ -35,6 +35,14 @@ public class BigInnovation extends ArrayList<BigInnovation.Item> {
             this.score = Double.parseDouble(score);
         }
 
+        public String getName() {
+            return name;
+        }
+
+        public double getScore() {
+            return score;
+        }
+
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder("Item{");

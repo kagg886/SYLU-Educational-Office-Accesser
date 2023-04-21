@@ -15,6 +15,11 @@
             android:label="@string/menu_gallery"/>
 
     <fragment
+            android:id="@+id/nav_innovation"
+            android:name="com.qlstudio.lite_kagg886.fragment.BigInnovationFragment"
+            android:label="@string/biginnovation"/>
+
+    <fragment
             android:id="@+id/nav_setting"
             android:name="com.qlstudio.lite_kagg886.fragment.SettingsFragment"
             android:label="@string/menu_setting"/>

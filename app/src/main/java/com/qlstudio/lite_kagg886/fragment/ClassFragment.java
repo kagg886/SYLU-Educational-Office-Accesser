@@ -1,6 +1,7 @@
 package com.qlstudio.lite_kagg886.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
+import com.alibaba.fastjson.JSON;
 import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.beans.ClassTable;
 import com.kagg886.jxw_collector.protocol.beans.Schedule;
@@ -74,16 +76,36 @@ public class ClassFragment extends Fragment {
         new Thread(() -> {
             Schedule schedule;
             SchoolCalendar calendar;
-
             ClassTable table;
-            try {
-                schedule = GlobalApplication.getApplicationNoStatic().getSession().getSchedule();
-                table = schedule.queryClassByYearAndTerm(schedule.getDefaultYears(), schedule.getDefaultTeamVal());
-                calendar = GlobalApplication.getApplicationNoStatic().getSession().getSchoolCalendar();
-            } catch (OfflineException e) {
-                GlobalApplication.getApplicationNoStatic().logout();
-                return;
+
+            SharedPreferences preferences = GlobalApplication.getApplicationNoStatic().getPreferences();
+            long life = Long.parseLong(preferences.getString("setting_cache", "180"));
+            if (preferences.getLong("cache_deadline_class", 0) - System.currentTimeMillis() <= 0) {
+                try {
+                    schedule = GlobalApplication.getApplicationNoStatic().getSession().getSchedule();
+                    table = schedule.queryClassByYearAndTerm(schedule.getDefaultYears(), schedule.getDefaultTeamVal());
+                    calendar = GlobalApplication.getApplicationNoStatic().getSession().getSchoolCalendar();
+                } catch (OfflineException e) {
+                    GlobalApplication.getApplicationNoStatic().logout();
+                    return;
+                }
+                preferences.edit()
+                        .putLong("cache_deadline_class", System.currentTimeMillis() + life * 60000)
+                        .putString("cache_schedule", JSON.toJSONString(schedule))
+                        .putString("cache_calendar", JSON.toJSONString(calendar))
+                        .putString("cache_table", JSON.toJSONString(table))
+                        .apply();
+
+            } else {
+                schedule = JSON.parseObject(preferences.getString("cache_schedule", null), Schedule.class);
+                schedule.setSession(GlobalApplication.getApplicationNoStatic().getSession());
+
+                calendar = JSON.parseObject(preferences.getString("cache_calendar", null), SchoolCalendar.class);
+                schedule.setSession(GlobalApplication.getApplicationNoStatic().getSession());
+
+                table = JSON.parseObject(preferences.getString("cache_table", null), ClassTable.class);
             }
+
             int a = 0;
             ClassTable perWeek;
             LocalDate date = calendar.getStart();
@@ -97,8 +119,8 @@ public class ClassFragment extends Fragment {
                 date = date.plusDays(7);
 //                break; //仅仅拿第一周做测试，
             }
-            //设置到正确的周数
 
+            //设置到正确的周数
             final int len = a;
             new Handler(Looper.getMainLooper()).post(() -> {
                 List<String> titles = new ArrayList<>();

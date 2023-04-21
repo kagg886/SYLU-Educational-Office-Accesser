@@ -20,10 +20,25 @@
 
     <PreferenceCategory
             app:title="@string/setting_debug">
+
         <SwitchPreference
                 android:defaultValue="false"
                 android:title="为课程表布局添加边界线"
                 android:key="setting_show_line"/>
+        <EditTextPreference
+                android:defaultValue="180"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:title="本地数据缓存时间"
+                android:summary="填入0则要求EOA客户端每次加载都从服务器获取数据"
+                android:key="setting_cache"/>
+
+        <Preference
+                android:key="setting_update_now"
+                app:summary="重置缓存状态"
+                app:title="通知EOA客户端更新缓存">
+        </Preference>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

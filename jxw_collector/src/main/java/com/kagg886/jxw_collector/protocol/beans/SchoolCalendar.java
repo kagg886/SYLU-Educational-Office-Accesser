@@ -20,8 +20,8 @@ import java.util.StringJoiner;
  */
 public class SchoolCalendar {
 
-    private final LocalDate start, end;
-    private final int terms;
+    private LocalDate start, end;
+    private int terms;
 
 
     public SchoolCalendar(SyluSession session) {
@@ -47,6 +47,17 @@ public class SchoolCalendar {
         end = LocalDate.of(Integer.parseInt(starts[0]), Integer.parseInt(starts[1]), Integer.parseInt(starts[2]));
     }
 
+//    @JSONCreator
+//    public SchoolCalendar(LocalDate start,LocalDate end,int terms) {
+//        this.start = start;
+//        this.end = end;
+//        this.terms = terms;
+//    }
+
+    public SchoolCalendar() {
+
+    }
+
     public LocalDate getStart() {
         return start;
     }
@@ -62,6 +73,18 @@ public class SchoolCalendar {
     public int getWeekFromStart() {
         LocalDate now = LocalDate.now();
         return (now.getDayOfYear() - start.getDayOfYear()) / 7 + 1;
+    }
+
+    public void setStart(LocalDate start) {
+        this.start = start;
+    }
+
+    public void setEnd(LocalDate end) {
+        this.end = end;
+    }
+
+    public void setTerms(int terms) {
+        this.terms = terms;
     }
 
     @Override

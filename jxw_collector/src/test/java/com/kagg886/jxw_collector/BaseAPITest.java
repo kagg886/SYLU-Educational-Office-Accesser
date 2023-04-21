@@ -1,11 +1,9 @@
 package com.kagg886.jxw_collector;
 
+import com.alibaba.fastjson.JSON;
 import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
-import com.kagg886.jxw_collector.protocol.beans.ClassTable;
-import com.kagg886.jxw_collector.protocol.beans.ExamResult;
-import com.kagg886.jxw_collector.protocol.beans.Schedule;
-import com.kagg886.jxw_collector.protocol.beans.UserInfo;
+import com.kagg886.jxw_collector.protocol.beans.*;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Assertions;
@@ -42,6 +40,27 @@ public class BaseAPITest {
         SyluSession session = new SyluSession("2203050528");
         session.loginByPwd(pwd);
         session.getRelate().forEach(System.out::println);
+    }
+
+    @Test
+    void testFastJSON() {
+        SyluSession session = new SyluSession("2203050528");
+        session.loginByPwd(pwd);
+
+        Schedule schedule = JSON.parseObject(JSON.toJSONString(session.getSchedule()), Schedule.class);
+        schedule.setSession(session);
+        System.out.println(schedule);
+
+        SchoolCalendar calendar = JSON.parseObject(JSON.toJSONString(session.getSchoolCalendar()), SchoolCalendar.class);
+        schedule.setSession(session);
+        System.out.println(calendar);
+
+        ClassTable table = schedule.queryClassByYearAndTerm(schedule.getDefaultYears(), schedule.getDefaultTeamVal());
+        table = JSON.parseObject(JSON.toJSONString(table), ClassTable.class);
+        System.out.println(table);
+
+        ExamResult result = JSON.parseObject(JSON.toJSONString(session.getExamResult()), ExamResult.class);
+        System.out.println(result);
     }
 
     @Test

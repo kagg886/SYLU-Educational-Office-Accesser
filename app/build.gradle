@@ -10,8 +10,8 @@ android {
         applicationId "com.qlstudio.lite_kagg886"
         minSdk 28
         targetSdk 33
-        versionCode 4
-        versionName "1.1-APPEND-1"
+        versionCode 5
+        versionName "1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

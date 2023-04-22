@@ -52,6 +52,9 @@ public class BigInnovationFragment extends Fragment {
             Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
                 contain.setAdapter(new BigInnovationAdapter(map));
                 count.setText("总大创学分:" + sum);
+                for (int i = 0; i < contain.getExpandableListAdapter().getGroupCount(); i++) {
+                    contain.expandGroup(i); //默认展开所有项
+                }
             });
         }).start();
         return v;

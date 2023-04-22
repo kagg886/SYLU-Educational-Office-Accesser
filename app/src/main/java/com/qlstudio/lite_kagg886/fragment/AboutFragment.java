@@ -1,6 +1,7 @@
 package com.qlstudio.lite_kagg886.fragment;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -81,6 +84,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener {
                 .isRTL(false)
                 .setImage(R.mipmap.ic_launcher)//图片
                 .setDescription("一个令人舒适的教务信息集成APP")//介绍
+                .addGroup("版本信息")
                 .addItem(new Element().setTitle("Version：" + BuildConfig.VERSION_NAME))
                 .addItem(new Element().setIconDrawable(R.drawable.ic_update).setTitle("检查更新").setOnClickListener(this))
                 .addGroup("关注我")
@@ -92,6 +96,17 @@ public class AboutFragment extends Fragment implements View.OnClickListener {
                         .setTitle("加入QQ群")
                         .setIntent(getIntent())
                 )
+                .addItem(new Element().setIconDrawable(R.drawable.ic_donate).setTitle("捐赠我!").setOnClickListener((v) -> {
+                    ImageView view = new ImageView(getActivity());
+                    try {
+                        view.setImageBitmap(BitmapFactory.decodeStream(getActivity().getAssets().open("pay.png")));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("截图保存二维码以捐赠")
+                            .setView(view).create().show();
+                }))
                 .create();
     }
 

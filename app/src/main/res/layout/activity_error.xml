@@ -17,9 +17,34 @@
             android:textSize="20sp"
             android:text="@string/error_help"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/textView2"
-            app:layout_constraintTop_toBottomOf="@+id/textView" app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView2"
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/join_qq_group"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" android:id="@+id/activity_error_joingroup"/>
+
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/get_log"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" android:id="@+id/activity_error_sendlog"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/activity_error_tip"
+                app:layout_constraintStart_toEndOf="@+id/activity_error_joingroup"
+                app:layout_constraintEnd_toStartOf="@+id/activity_error_sendlog"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <ListView
             android:layout_width="match_parent"
             android:layout_height="0dp"

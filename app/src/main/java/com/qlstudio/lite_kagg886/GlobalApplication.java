@@ -14,11 +14,16 @@ import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.qlstudio.lite_kagg886.activity.ErrorActivity;
 import com.qlstudio.lite_kagg886.activity.LoginActivity;
+import com.qlstudio.lite_kagg886.util.HttpClientProxy;
+import com.qlstudio.lite_kagg886.util.LogCatcher;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.Map;
 
 /**
@@ -72,13 +77,36 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
         return preferences;
     }
 
+    public File getLoggerBase() {
+        return new File(getFilesDir(), "log");
+    }
+
+    @SuppressLint("DefaultLocale")
     @Override
     public void onCreate() {
         super.onCreate();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        session = new SyluSession();
+        session = new SyluSession(new HttpClientProxy());
         if (preferences.getString("user", null) != null) {
             session.setUser(preferences.getString("user", null));
+        }
+
+        //设置日志记录器
+        File logRoot = getLoggerBase();
+        logRoot.mkdirs();
+        int i = 0;
+        File log;
+        do {
+            LocalDate date = LocalDate.now();
+            log = new File(logRoot, String.format("%d-%d-%d_%d.log", date.getYear(), date.getMonth().getValue(), date.getDayOfMonth(), i));
+            i++;
+        } while (log.exists());
+        try {
+            log.createNewFile();
+            new LogCatcher(log).start();
+        } catch (IOException e) {
+            System.out.println(log.getAbsolutePath());
+            throw new RuntimeException(e);
         }
 
         Thread.setDefaultUncaughtExceptionHandler(this);
@@ -114,7 +142,10 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
     }
 
     public void logout() {
-        GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(GlobalApplication.getApplicationNoStatic().getSession().getStuCode()));
+        String stu = GlobalApplication.getApplicationNoStatic().getSession().getStuCode();
+        SyluSession session1 = new SyluSession(new HttpClientProxy());
+        session1.setUser(stu);
+//        GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(new HttpClientProxy()));
         GlobalApplication.getApplicationNoStatic().getPreferences().edit().putString("pwd", "").apply();
         Intent p = new Intent(getApplicationContext(), LoginActivity.class);
         p.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?
@@ -139,7 +170,7 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
     }
 
     private void goCrash(Throwable th) {
-        Log.e("WRONG", "CRASH!", th);
+        Log.e("WRONG", "App Crash and will exit App", th);
         new Thread(() -> {
             Intent i = new Intent(getApplicationContext(), ErrorActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?

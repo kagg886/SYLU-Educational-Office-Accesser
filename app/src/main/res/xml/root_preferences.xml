@@ -25,6 +25,12 @@
                 android:defaultValue="false"
                 android:title="为课程表布局添加边界线"
                 android:key="setting_show_line"/>
+
+        <Preference
+                android:defaultValue="false"
+                android:title="闪退测试"
+                android:summary="没事别点"
+                android:key="setting_test_crash"/>
         <EditTextPreference
                 android:defaultValue="180"
                 android:selectAllOnFocus="true"

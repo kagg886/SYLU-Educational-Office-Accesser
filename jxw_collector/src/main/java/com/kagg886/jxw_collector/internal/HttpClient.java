@@ -87,7 +87,7 @@ public class HttpClient {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("HttpClient{");
-        sb.append("connection=")
+        sb.append("connection={")
                 .append("{url=").append(connection.request().url()).append("}")
                 .append("{headers=").append(connection.request().headers()).append("}")
                 .append("{data=").append(connection.request().data()).append("}")

@@ -54,6 +54,10 @@ public class SyluSession {
         client = new HttpClient();
     }
 
+    public SyluSession(HttpClient client) {
+        this.client = client;
+    }
+
     public void setUser(String user) {
         if (this.user != null) {
             throw new IllegalStateException("已初始化的用户禁止调用此方法");

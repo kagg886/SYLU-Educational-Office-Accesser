@@ -37,5 +37,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             update_button.setEnabled(Integer.parseInt(newValue.toString()) > 0);
             return true;
         });
+
+        findPreference("setting_test_crash").setOnPreferenceClickListener(preference -> {
+            throw new RuntimeException("这玩意是测试用的，不许截图，我不处理");
+        });
     }
 }

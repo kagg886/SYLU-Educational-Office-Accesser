@@ -32,6 +32,7 @@ public class HttpClient {
         try {
             return connection.method(Connection.Method.GET).execute();
         } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }

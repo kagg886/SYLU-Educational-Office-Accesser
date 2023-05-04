@@ -13,7 +13,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -125,6 +127,100 @@ public class SyluSession {
         StringBuilder builder = new StringBuilder(base);
         Arrays.stream(p).forEach(builder::append);
         return builder.toString();
+    }
+
+    public SecondClassData getSecondClassData(String pass) {
+        HttpClient client = new HttpClient();
+        Connection.Response resp = client.url("http://xg.sylu.edu.cn/SyluTW/Sys/UserLogin.aspx")
+                .get();
+        Document dom = null;
+        try {
+            dom = resp.parse();
+        } catch (IOException ignored) {
+        }
+        client.header("Cookie", resp.header("Set-Cookie"));
+
+        String user = getStuCode();
+        String pubKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3hzrH91c0OKgtaSB7GWGfDuUJsMrtiYThDXtJdrCr7exKt2fmIZngoFk71Dv/BPVQCHSuohNNvEV9VVDFSBhsP9xKEDAM4/2Lv+wlzN9CuZtLpV3Elo8VacjwMHcjTRmTchRBmijQzZRFrA2LM+qsH3U5tRM1uJFbfRMkBq24AwIDAQAB";
+
+
+        //---------------根据公钥加密-----------------
+        resp = client.data("UserName", user)
+                .data("__VIEWSTATE", dom.getElementById("__VIEWSTATE").attr("value"))
+                .data("__VIEWSTATEGENERATOR", dom.getElementById("__VIEWSTATEGENERATOR").attr("value"))
+                .data("__EVENTVALIDATION", dom.getElementById("__EVENTVALIDATION").attr("value"))
+                .data("Password", pass)
+                .data("pwd", RSA.getInstance().encrypt(pass, pubKey))
+                .data("pubKey", pubKey)
+                .data("codeInput", "1145")
+                .data("queryBtn", "%B5%C7++++++++++%C2%BC")
+                .post();
+
+        try {
+            dom = resp.parse();
+        } catch (IOException ignored) {
+        }
+
+        AtomicBoolean isSuccess = new AtomicBoolean(false);
+
+        dom.getElementsByTag("script").forEach((v) -> {
+            if (v.html().startsWith("layer.alert('")) {
+                int l = v.html().indexOf("'") + 1;
+                int r = v.html().indexOf("'", l);
+                throw new OfflineException.LoginFailed(v.html().substring(l, r));
+            }
+
+            if (v.html().equals("window.location.href='SystemForm/main.htm';")) {
+                isSuccess.set(true);
+            }
+        });
+
+        if (!isSuccess.get()) {
+            throw new OfflineException("Check State Failed!\n" + dom.html());
+        }
+
+        //fetch("http://xg.sylu.edu.cn/SyluTW/Sys/SystemForm/FinishExam/StuFinishStudentScore.aspx", {
+        //  "headers": {
+        //    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        //    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+        //    "cache-control": "no-cache",
+        //    "pragma": "no-cache",
+        //    "upgrade-insecure-requests": "1",
+        //    "cookie": "ASP.NET_SessionId=xog130uka5dmv1x314gq5gdx; CenterSoft=FBA84D75C17E79A16FCB2FC108C2CAA830EC75D1C2D9933E3FEE8F41DC2C280470D75ABBB25AD0059BF6EE3798BCCD79ED5E3573A15F4A23B827BBD7F731B7FBA287524B6649BC9C39CECEC21519265ABE7A9888006E865CA683A68B1C7716D686C4E98887B081CAD6B03E6922E4127C2A37443293D5D9AF611F8CB34188418DE1FB1DA9E638F9E4B053F70DABB6C6F5077E1BF7E779B03A268BC9E70D143B2F953F3E7BBD2FEBA95CB97D1C06E21369E9683ABF97C3EB2CDB214E79FC930DD78DF4F3B6CA9DF17DDD965E624B26A2E5AE3EACB548910A8DC5159365E6536D4A2B08955ADDB0553BBE376260C0D4B378",
+        //    "Referer": "http://xg.sylu.edu.cn/SyluTW/Sys/SystemForm/Navigation.aspx",
+        //    "Referrer-Policy": "strict-origin-when-cross-origin"
+        //  },
+        //  "body": null,
+        //  "method": "GET"
+        //});
+
+        client = new HttpClient()
+                .url("http://xg.sylu.edu.cn/SyluTW/Sys/SystemForm/FinishExam/StuFinishStudentScore.aspx")
+                .setCookie("ASP.NET_SessionId", resp.cookie("ASP.NET_SessionId"))
+                .setCookie("CenterSoft", Objects.requireNonNull(resp.header("Set-Cookie")).split("CenterSoft=")[2].split("; ")[0]);
+        resp = client.get();
+        try {
+            dom = resp.parse();
+        } catch (IOException ignored) {
+        }
+
+        SecondClassData data = new SecondClassData();
+        for (char a = 'A'; a <= 'E'; a++) {
+            Double min = Double.parseDouble(dom.getElementById("Count" + a).text());
+            String e = dom.getElementById("Count" + a + "1").text();
+            Double now = Double.parseDouble(e.isEmpty() ? "0.00" : e);
+            try {
+                SecondClassData.class.getMethod("set" + a, double.class).invoke(data, min);
+                SecondClassData.class.getMethod("set" + a + "1", double.class).invoke(data, now);
+            } catch (Exception ignored) {
+            }
+
+        }
+        data.setSum(Double.parseDouble(dom.getElementById("SunCount").text()));
+
+        String e = dom.getElementById("SunCount1").text();
+        data.setSum1(Double.parseDouble(e.isEmpty() ? "0.00" : e));
+        return data;
     }
 
     public List<TeacherRelate> getRelate() {

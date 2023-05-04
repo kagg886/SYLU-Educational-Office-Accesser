@@ -13,8 +13,10 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 /**
@@ -33,12 +35,69 @@ public class RSA {
         return rsa;
     }
 
-    public String encrypt(JSONObject keyVal,String pwd) {
+    private static byte[] rsaSplitCodec(Cipher cipher, int opmode, byte[] datas, int keySize) {
+        int maxBlock = 0;
+        if (opmode == Cipher.DECRYPT_MODE) {
+            maxBlock = keySize / 8;
+        } else {
+            maxBlock = keySize / 8 - 11;
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int offSet = 0;
+        byte[] buff;
+        int i = 0;
         try {
-            return encrypt0(keyVal.getString("modulus"),keyVal.getString("exponent"),pwd);
+            while (datas.length > offSet) {
+                if (datas.length - offSet > maxBlock) {
+                    buff = cipher.doFinal(datas, offSet, maxBlock);
+                } else {
+                    buff = cipher.doFinal(datas, offSet, datas.length - offSet);
+                }
+                out.write(buff, 0, buff.length);
+                i++;
+                offSet = i * maxBlock;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("加解密阀值为[" + maxBlock + "]的数据时发生异常", e);
+        }
+        byte[] resultDatas = out.toByteArray();
+        try {
+            out.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return resultDatas;
+    }
+
+    public String encrypt(JSONObject keyVal, String pwd) {
+        try {
+            return encrypt0(keyVal.getString("modulus"), keyVal.getString("exponent"), pwd);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException |
                  IllegalBlockSizeException | BadPaddingException | IOException e) {
-            throw new RuntimeException("Encrypt Failed!",e);
+            throw new RuntimeException("Encrypt Failed!", e);
+        }
+    }
+
+    /*
+     * @param data: 数据
+     * @param key: 公钥
+     * @return String
+     * @author kagg886
+     * @description 只根据公钥的RSA加密
+     * @date 2023/05/04 14:00
+     */
+    public String encrypt(String data, String key) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(com.alibaba.fastjson.util.Base64.decodeFast(key));
+            RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(x509KeySpec);
+
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            return Base64.getEncoder().encodeToString(rsaSplitCodec(cipher, Cipher.ENCRYPT_MODE, data.getBytes(), publicKey.getModulus().bitLength()));
+        } catch (Exception e) {
+            throw new RuntimeException("加密字符串[" + data + "]时遇到异常", e);
         }
     }
 

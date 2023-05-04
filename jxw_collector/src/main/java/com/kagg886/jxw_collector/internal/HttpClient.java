@@ -37,6 +37,11 @@ public class HttpClient {
         }
     }
 
+    public HttpClient setCookie(String k, String v) {
+        connection.cookie(k, v);
+        return this;
+    }
+
     public synchronized Connection.Response post() {
         try {
             return connection.method(Connection.Method.POST).execute();

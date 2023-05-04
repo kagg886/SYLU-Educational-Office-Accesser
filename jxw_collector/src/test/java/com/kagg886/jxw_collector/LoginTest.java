@@ -2,6 +2,7 @@ package com.kagg886.jxw_collector;
 
 import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
+import com.kagg886.jxw_collector.protocol.beans.SecondClassData;
 import org.junit.jupiter.api.*;
 
 import java.io.BufferedReader;
@@ -33,6 +34,8 @@ public class LoginTest {
     public void doLoginTestSuccess() throws Exception {
         SyluSession session = new SyluSession("2203050528");
         session.loginByPwd(pwd);
+        SecondClassData data = session.getSecondClassData(pwd);
+        System.out.println(data);
     }
 
     @Test

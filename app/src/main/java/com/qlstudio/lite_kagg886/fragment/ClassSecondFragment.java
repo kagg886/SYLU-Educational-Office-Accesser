@@ -107,6 +107,11 @@ public class ClassSecondFragment extends Fragment {
         });
 
         EditText editText = dialogRoot.findViewById(R.id.dialog_classsecedit_pass);
+
+        String pass0 = sp.getString("pwd_TW", null);
+        if (!TextUtils.isEmpty(pass0)) {
+            editText.setText(pass0);
+        }
         Button login = dialogRoot.findViewById(R.id.dialog_classsecedit_login);
 
         login.setOnClickListener((v) -> {

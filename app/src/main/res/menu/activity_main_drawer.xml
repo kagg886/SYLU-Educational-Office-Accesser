@@ -17,6 +17,10 @@
 
     <group android:checkableBehavior="single" android:id="@+id/group2">
         <item
+                android:id="@+id/nav_class2"
+                android:icon="@drawable/ic_score2"
+                android:title="@string/class2"/>
+        <item
                 android:id="@+id/nav_innovation"
                 android:icon="@drawable/ic_biginnovate"
                 android:title="@string/biginnovation"/>

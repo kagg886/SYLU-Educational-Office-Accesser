@@ -36,7 +36,7 @@
                 android:selectAllOnFocus="true"
                 android:singleLine="true"
                 android:title="本地数据缓存时间"
-                android:summary="填入0则要求EOA客户端每次加载都从服务器获取数据"
+                android:summary="填入0则要求EOA客户端每次加载都从服务器获取数据，默认值为180小时即七天半"
                 android:key="setting_cache"/>
 
         <Preference

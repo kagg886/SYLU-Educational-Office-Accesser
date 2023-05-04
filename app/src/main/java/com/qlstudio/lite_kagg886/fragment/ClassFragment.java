@@ -90,7 +90,8 @@ public class ClassFragment extends Fragment {
                     return;
                 }
                 preferences.edit()
-                        .putLong("cache_deadline_class", System.currentTimeMillis() + life * 60000)
+                        //一小时为3600000毫秒，所以初始值是180小时即7天半
+                        .putLong("cache_deadline_class", System.currentTimeMillis() + life * 3600000)
                         .putString("cache_schedule", JSON.toJSONString(schedule))
                         .putString("cache_calendar", JSON.toJSONString(calendar))
                         .putString("cache_table", JSON.toJSONString(table))

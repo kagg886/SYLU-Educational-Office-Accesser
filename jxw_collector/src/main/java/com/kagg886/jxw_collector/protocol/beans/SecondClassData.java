@@ -1,5 +1,8 @@
 package com.kagg886.jxw_collector.protocol.beans;
 
+import com.kagg886.jxw_collector.exceptions.OfflineException;
+import org.jsoup.nodes.Document;
+
 /**
  * @projectName: 掌上沈理青春版
  * @package: com.kagg886.jxw_collector.protocol.beans
@@ -12,6 +15,29 @@ package com.kagg886.jxw_collector.protocol.beans;
 public class SecondClassData {
     private double A, B, C, D, E, Sum;
     private double A1, B1, C1, D1, E1, Sum1;
+
+    public SecondClassData() {
+    }
+
+    //用于模拟，正常情况下应该从SyluSession获取
+    public SecondClassData(Document dom) {
+        for (char a = 'A'; a <= 'E'; a++) {
+            Double min = Double.parseDouble(dom.getElementById("Count" + a).text());
+            String e = dom.getElementById("Count" + a + "1").text();
+            Double now = Double.parseDouble(e.isEmpty() ? "0.00" : e);
+            try {
+                SecondClassData.class.getMethod("set" + a, double.class).invoke(this, min);
+                SecondClassData.class.getMethod("set" + a + "1", double.class).invoke(this, now);
+            } catch (Exception ignored) {
+            }
+
+        }
+        setSum(Double.parseDouble(dom.getElementById("SunCount").text()));
+
+        String e = dom.getElementById("SunCount1").text();
+        setSum1(Double.parseDouble(e.isEmpty() ? "0.00" : e));
+        throw new OfflineException.LoginFailed("账号密码错误!");
+    }
 
     public double getA1() {
         return A1;

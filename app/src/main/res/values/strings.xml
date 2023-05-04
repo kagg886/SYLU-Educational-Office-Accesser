@@ -38,4 +38,9 @@
     <string name="join_qq_group">加入QQ群</string>
     <string name="get_log">打包日志</string>
     <string name="class2">第二课堂</string>
+    <string name="class2_tips">
+        请输入团委网的密码。\n若您从未登陆过，请单击下面的\'前往团委网\'以在网页端登录\n修改密码后回到本页面登录(需要连校园网)\n若不填写密码字段则尝试以教务网密码登录
+    </string>
+    <string name="pass">密码</string>
+    <string name="goTW">前往团委网</string>
 </resources>

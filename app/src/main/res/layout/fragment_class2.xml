@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto" android:orientation="vertical"
+              android:gravity="center"
+              android:layout_width="match_parent"
+              android:weightSum="4"
+              android:layout_height="match_parent">
+
+    <com.qlstudio.lite_kagg886.widget.SpiderWebPropertyDiagram
+            android:id="@+id/class2_diagram"
+            android:layout_weight="3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="0dp"
+                                                       android:layout_weight="1">
+
+        <TextView
+                android:textSize="20sp"
+                android:padding="10sp"
+                android:background="@drawable/radius_drawable_bg_green"
+                android:text="@string/demo"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/class2_text" app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>

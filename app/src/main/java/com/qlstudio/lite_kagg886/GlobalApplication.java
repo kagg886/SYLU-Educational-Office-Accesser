@@ -69,6 +69,12 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
         return session;
     }
 
+    public boolean isInNightMode() {
+//        深色模式的值为:0x21
+//        浅色模式的值为:0x11
+        return getResources().getConfiguration().uiMode == 0x21;
+    }
+
     public void setSession(SyluSession session) {
         this.session = session;
     }

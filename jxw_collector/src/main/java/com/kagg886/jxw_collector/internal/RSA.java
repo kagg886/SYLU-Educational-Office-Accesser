@@ -91,7 +91,7 @@ public class RSA {
             Cipher cipher = Cipher.getInstance("RSA");
 
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(com.alibaba.fastjson.util.Base64.decodeFast(key));
+            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(key.getBytes()));
             RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(x509KeySpec);
 
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);

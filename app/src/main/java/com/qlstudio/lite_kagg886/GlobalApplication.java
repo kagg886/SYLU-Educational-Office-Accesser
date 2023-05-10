@@ -91,6 +91,8 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
     @Override
     public void onCreate() {
         super.onCreate();
+
+
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         session = new SyluSession(new HttpClientProxy());
         if (preferences.getString("user", null) != null) {

@@ -22,6 +22,7 @@ import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.SyluSession;
 import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
+import com.qlstudio.lite_kagg886.fragment.AboutFragment;
 
 import java.util.Objects;
 
@@ -171,6 +172,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                         builder.setMessage("无法连接到教务网，请检查网络状态后重试");
                     } else if ((e instanceof OfflineException)) {
                         builder.setMessage(e.getMessage());
+                        builder.setPositiveButton("找回密码", (dialog, which) -> AboutFragment.openUrlByBrowser("https://jxw.sylu.edu.cn/pwdmgr/retake/index.zf"));
                     } else if (Objects.requireNonNull(e.getMessage()).contains("Read timeout")) {
                         builder.setMessage("连接超时!请检查网络状态后重试");
                     } else {
@@ -182,7 +184,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             animController.sendEmptyMessage(1);
         }).start();
     }
-
     private void inputAnimator(final View view, float w) {
         AnimatorSet set = new AnimatorSet();
         ValueAnimator animator = ValueAnimator.ofFloat(0, w);

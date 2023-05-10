@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import com.alibaba.fastjson.JSON;
-import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.protocol.beans.SecondClassData;
 import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
@@ -171,15 +170,10 @@ public class ClassSecondFragment extends Fragment {
                 twLoginResult.sendMessage(msg);
                 GlobalApplication.getApplicationNoStatic().getPreferences().edit()
                         .putString("pwd_TW", pass).apply();
-            } catch (OfflineException.LoginFailed e) {
-                Message msg = new Message();
-                msg.what = -1;
-                msg.getData().putString("cause", e.getMessage());
-                twLoginResult.sendMessage(msg);
             } catch (Exception e) {
                 Message msg = new Message();
                 msg.what = -1;
-                msg.getData().putString("cause", "无法连接到团委网，请检查是否连接了校园网!");
+                msg.getData().putString("cause", e.getMessage());
                 twLoginResult.sendMessage(msg);
             }
         }

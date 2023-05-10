@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import com.qlstudio.lite_kagg886.BuildConfig;
+import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
@@ -27,7 +28,6 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
-import java.util.Objects;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -146,8 +146,8 @@ public class AboutFragment extends Fragment implements View.OnClickListener {
         }).start();
     }
 
-    private void openUrlByBrowser(String url) {
+    public static void openUrlByBrowser(String url) {
         Uri uri = Uri.parse(url);
-        Objects.requireNonNull(getActivity()).startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        GlobalApplication.getCurrentActivity().startActivity(new Intent(Intent.ACTION_VIEW, uri));
     }
 }

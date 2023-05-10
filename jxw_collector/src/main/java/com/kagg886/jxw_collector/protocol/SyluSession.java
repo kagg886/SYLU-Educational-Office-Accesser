@@ -141,9 +141,10 @@ public class SyluSession {
         client.header("Cookie", resp.header("Set-Cookie"));
 
         String user = getStuCode();
-        String pubKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3hzrH91c0OKgtaSB7GWGfDuUJsMrtiYThDXtJdrCr7exKt2fmIZngoFk71Dv/BPVQCHSuohNNvEV9VVDFSBhsP9xKEDAM4/2Lv+wlzN9CuZtLpV3Elo8VacjwMHcjTRmTchRBmijQzZRFrA2LM+qsH3U5tRM1uJFbfRMkBq24AwIDAQAB";
-
-
+        String pubKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3hzrH91c0OKgtaSB7GWGfDuUJ" +
+                "sMrtiYThDXtJdrCr7exKt2fmIZngoFk71Dv/BPVQCHSuohNNvEV9VVDFSBhsP9xK" +
+                "EDAM4/2Lv+wlzN9CuZtLpV3Elo8VacjwMHcjTRmTchRBmijQzZRFrA2LM+qsH3U5" +
+                "tRM1uJFbfRMkBq24AwIDAQAB";
         //---------------根据公钥加密-----------------
         resp = client.data("UserName", user)
                 .data("__VIEWSTATE", dom.getElementById("__VIEWSTATE").attr("value"))
@@ -152,7 +153,7 @@ public class SyluSession {
                 .data("Password", pass)
                 .data("pwd", RSA.getInstance().encrypt(pass, pubKey))
                 .data("pubKey", pubKey)
-                .data("codeInput", "1145")
+                .data("codeInput", "KHG6")
                 .data("queryBtn", "%B5%C7++++++++++%C2%BC")
                 .post();
 

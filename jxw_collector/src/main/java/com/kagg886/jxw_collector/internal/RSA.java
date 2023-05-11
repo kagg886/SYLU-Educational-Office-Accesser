@@ -87,8 +87,9 @@ public class RSA {
      * @date 2023/05/04 14:00
      */
     public String encrypt(String data, String key) {
+        String tag = "RSA/ECB/PKCS1Padding"; //Android必须这么写，不然加密失败
         try {
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance(tag);
 
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(key.getBytes()));
@@ -97,6 +98,7 @@ public class RSA {
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             return Base64.getEncoder().encodeToString(rsaSplitCodec(cipher, Cipher.ENCRYPT_MODE, data.getBytes(), publicKey.getModulus().bitLength()));
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("加密字符串[" + data + "]时遇到异常", e);
         }
     }

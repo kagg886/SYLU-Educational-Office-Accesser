@@ -1,5 +1,7 @@
 package com.qlstudio.lite_kagg886.util;
 
+import android.util.Log;
+
 import java.io.*;
 
 /**
@@ -13,9 +15,9 @@ import java.io.*;
  */
 public class LogCatcher extends Thread {
 
-    private BufferedWriter writer;
+    private final BufferedWriter writer;
 
-    private BufferedReader reader;
+    private final BufferedReader reader;
 
     public LogCatcher(File write) throws IOException {
         this.writer = new BufferedWriter(new FileWriter(write));
@@ -25,10 +27,16 @@ public class LogCatcher extends Thread {
     @Override
     public void run() {
         try {
+            //TODO Vivo手机for内不加try一直白屏
             for (String s = reader.readLine(); ; s = reader.readLine()) {
-                writer.write(s);
-                writer.write("\n");
-                writer.flush();
+                try {
+                    writer.write(s);
+                    writer.write("\n");
+                    writer.flush();
+                } catch (Exception e) {
+                    Log.e(getClass().getName(), "Logcat记录错误!", e);
+                    return;
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

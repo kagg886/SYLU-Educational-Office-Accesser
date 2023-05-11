@@ -63,7 +63,7 @@ public class ClassSecondFragment extends Fragment {
                     if (!dialog.isShowing()) {
                         dialog.show();
                     }
-                    Toast.makeText(getContext(), msg.getData().getString("cause"), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GlobalApplication.getCurrentActivity(), msg.getData().getString("cause"), Toast.LENGTH_SHORT).show();
                     login.setEnabled(true);
                     break;
                 case 0:

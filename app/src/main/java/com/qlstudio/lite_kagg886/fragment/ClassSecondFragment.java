@@ -123,6 +123,15 @@ public class ClassSecondFragment extends Fragment {
             new Thread(new LoginAction().setPass(pass)).start();
         });
 
+        Button exit = dialogRoot.findViewById(R.id.dialog_classsecedit_exit);
+
+        exit.setOnClickListener((v) -> {
+            dialog.cancel();
+            dialog.dismiss();
+            Objects.requireNonNull(getActivity()).onBackPressed();
+        });
+
+
         dialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setView(dialogRoot)
                 .setCancelable(false)

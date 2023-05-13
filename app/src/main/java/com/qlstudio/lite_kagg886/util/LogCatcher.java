@@ -21,14 +21,32 @@ public class LogCatcher extends Thread {
 
     public LogCatcher(File write) throws IOException {
         this.writer = new BufferedWriter(new FileWriter(write));
-        reader = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec("logcat").getInputStream()));
+        Process process = Runtime.getRuntime().exec(new String[]{"logcat", "-v", "threadtime", "TAG:*"});
+        reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BufferedReader reader1 = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+                try {
+                    String s;
+                    while ((s = reader1.readLine()) != null) {
+                        Log.e(getClass().getName(), s);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 
     @Override
     public void run() {
         try {
+            String s;
             //TODO Vivo手机for内不加try一直白屏
-            for (String s = reader.readLine(); ; s = reader.readLine()) {
+            while ((s = reader.readLine()) != null) {
                 try {
                     writer.write(s);
                     writer.write("\n");

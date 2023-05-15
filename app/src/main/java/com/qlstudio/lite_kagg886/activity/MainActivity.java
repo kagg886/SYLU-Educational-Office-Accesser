@@ -1,10 +1,15 @@
 package com.qlstudio.lite_kagg886.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.*;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -50,12 +55,38 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private ActivityResultLauncher<Intent> caller;
+
+    private volatile ActivityResult result;
+
+    public ActivityResultLauncher<Intent> getCaller() {
+        return caller;
+    }
+
+    public ActivityResult getResultBlocked() {
+        while (result == null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Thread.onSpinWait();
+            }
+        }
+        ActivityResult s = result;
+        result = null;
+        return s;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        caller = this.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                MainActivity.this.result = result;
+            }
+        });
 
         setSupportActionBar(binding.appBarMain.toolbar);
 

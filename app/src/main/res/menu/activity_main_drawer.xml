@@ -28,6 +28,11 @@
 
     <group android:checkableBehavior="single" android:id="@+id/group3">
         <item
+                android:id="@+id/nav_tool"
+                android:title="@string/tools"
+                android:icon="@drawable/ic_tool"/>
+
+        <item
                 android:id="@+id/nav_setting"
                 android:icon="@drawable/ic_setting"
                 android:title="@string/menu_setting"/>

@@ -1,6 +1,7 @@
 package com.qlstudio.lite_kagg886.widget;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.View;
@@ -11,14 +12,21 @@ import java.util.Objects;
 
 public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private int mDividerHeight = 2;
-    private int mDividerColor = 0xFFFF0000;
     private Paint mPaint;
     private int mOrientation;
 
     public GridItemDecoration(@RecyclerView.Orientation int orientation) {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setColor(mDividerColor);
+        mPaint.setColor(0xFFFF0000);
         mOrientation = orientation;
+    }
+
+    private void setColor(Color color) {
+        mPaint.setColor(color.toArgb());
+    }
+
+    public void setColor(int color) {
+        mPaint.setColor(color);
     }
 
     @Override

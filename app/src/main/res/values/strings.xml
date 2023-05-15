@@ -44,4 +44,8 @@
     <string name="pass">密码</string>
     <string name="goTW">前往团委网</string>
     <string name="exit">退出</string>
+    <string name="tools">工具</string>
+    <string name="choose">选择</string>
+    <string name="yes">确定</string>
+    <string name="no_choose">未选择</string>
 </resources>

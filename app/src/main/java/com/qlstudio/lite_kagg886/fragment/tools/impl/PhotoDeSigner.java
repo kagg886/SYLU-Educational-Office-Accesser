@@ -24,6 +24,7 @@ import com.qlstudio.lite_kagg886.util.ScaleUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -101,35 +102,62 @@ public class PhotoDeSigner extends AbstractDialogFragments {
             new Thread(() -> {
                 SyluSession userInfo = GlobalApplication.getApplicationNoStatic().getSession();
                 String name = userInfo.getUserInfo().getName().split(" ")[0];
-                String zip = UUID.randomUUID().toString().replace("-", "") + ".zip";
+                String zip = UUID.randomUUID().toString().replace("-", "") + (uris.size() == 1 ? ".png" : ".zip");
                 File file = new File(activity.getCacheDir().toPath().resolve("share").toFile(), zip);
                 file.getParentFile().mkdirs();
-                ZipOutputStream zipStream;
-                try {
-                    file.createNewFile();
-                    zipStream = new ZipOutputStream(Files.newOutputStream(file.toPath()));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
 
-                for (int i = 0; i < uris.size(); i++) {
+                if (uris.size() != 1) {
+                    ZipOutputStream zipStream;
                     try {
-                        Bitmap src = BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uris.get(i)));
+                        file.createNewFile();
+                        zipStream = new ZipOutputStream(Files.newOutputStream(file.toPath()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    for (int i = 0; i < uris.size(); i++) {
+                        try {
+                            Bitmap src = BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uris.get(i)));
+                            src = cloneAndDrawText(src, String.format("%s\n%s", userInfo.getStuCode(), name));
+
+                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+                            src.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                            out.flush();
+                            out.close();
+
+                            zipStream.putNextEntry(new ZipEntry(i + ".png"));
+                            zipStream.write(out.toByteArray());
+                            zipStream.flush();
+
+                            int finalI = i;
+                            activity.runOnUiThread(() -> {
+                                button1.setText(String.format("%s/%s", finalI, uris.size()));
+                            });
+                        } catch (Exception e) {
+                            activity.runOnUiThread(() -> {
+                                builder.setCancelable(true);
+                                button.setEnabled(true);
+                                button1.setEnabled(true);
+                                button1.setText("确定");
+                                Log.e("PhotoDesigner", "图片生成过程中出错", e);
+                                Toast.makeText(c, "发生了一点小错误!", Toast.LENGTH_SHORT).show();
+                            });
+                            return;
+                        }
+                    }
+                    try {
+                        zipStream.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    try {
+                        Bitmap src = BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uris.get(0)));
                         src = cloneAndDrawText(src, String.format("%s\n%s", userInfo.getStuCode(), name));
 
-                        ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        src.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        FileOutputStream out = new FileOutputStream(file);
+                        src.compress(Bitmap.CompressFormat.PNG, 80, out);
                         out.flush();
                         out.close();
-
-                        zipStream.putNextEntry(new ZipEntry(i + ".png"));
-                        zipStream.write(out.toByteArray());
-                        zipStream.flush();
-
-                        int finalI = i;
-                        activity.runOnUiThread(() -> {
-                            button1.setText(String.format("%s/%s", finalI, uris.size()));
-                        });
                     } catch (Exception e) {
                         activity.runOnUiThread(() -> {
                             builder.setCancelable(true);
@@ -142,22 +170,17 @@ public class PhotoDeSigner extends AbstractDialogFragments {
                         return;
                     }
                 }
-                try {
-                    activity.runOnUiThread(() -> {
-                        builder.setCancelable(true);
-                        button.setEnabled(true);
-                        button1.setEnabled(true);
-                        button1.setText("确定");
-                        Toast.makeText(c, "生成完毕!", Toast.LENGTH_SHORT).show();
-                    });
-                    zipStream.close();
-                    Intent intent = new Intent("android.intent.action.SEND");
-                    intent.putExtra("android.intent.extra.STREAM", FileProvider.getUriForFile(c, "com.qlstudio.lite_kagg886.fileprovider", file));
-                    intent.setType("*/*");
-                    activity.startActivity(intent);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                activity.runOnUiThread(() -> {
+                    builder.setCancelable(true);
+                    button.setEnabled(true);
+                    button1.setEnabled(true);
+                    button1.setText("确定");
+                    Toast.makeText(c, "生成完毕!", Toast.LENGTH_SHORT).show();
+                });
+                Intent intent = new Intent("android.intent.action.SEND");
+                intent.putExtra("android.intent.extra.STREAM", FileProvider.getUriForFile(c, "com.qlstudio.lite_kagg886.fileprovider", file));
+                intent.setType(uris.size() == 1 ? "image/*" : "*/*");
+                activity.startActivity(intent);
             }).start();
         });
 

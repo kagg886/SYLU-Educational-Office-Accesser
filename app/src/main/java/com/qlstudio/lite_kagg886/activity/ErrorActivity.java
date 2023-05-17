@@ -108,9 +108,14 @@ public class ErrorActivity extends AppCompatActivity {
 
                             try (FileInputStream stream = new FileInputStream(log)) {
                                 byte[] buffer = new byte[1024];
-                                int readOnly = stream.read(buffer);
-                                //使用缓冲区，效率杠杠的
-                                out.write(buffer, 0, readOnly);
+                                int len;
+                                while ((len = stream.read(buffer)) != -1) {
+                                    out.write(buffer, 0, len);
+                                }
+//                                byte[] buffer = new byte[1024];
+//                                int readOnly = stream.read(buffer);
+//                                //使用缓冲区，效率杠杠的
+//                                out.write(buffer, 0, readOnly);
                             }
                             handler.sendEmptyMessage(3);
                         }

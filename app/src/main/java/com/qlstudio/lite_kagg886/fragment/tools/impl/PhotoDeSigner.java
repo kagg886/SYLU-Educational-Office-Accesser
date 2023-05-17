@@ -20,6 +20,7 @@ import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.activity.MainActivity;
 import com.qlstudio.lite_kagg886.fragment.tools.AbstractDialogFragments;
+import com.qlstudio.lite_kagg886.util.ScaleUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,7 +46,10 @@ public class PhotoDeSigner extends AbstractDialogFragments {
         //准备画笔类
         Paint textPaint = new Paint();
         textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(src.getHeight() * 0.05f);
+        textPaint.setTextSize(ScaleUtil.dip2px(ScaleUtil.px2dip(src.getWidth() * 0.1f)));
+
+        Paint bgPaint = new Paint();
+        bgPaint.setColor(Color.WHITE);
 
         Bitmap dst = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(dst);
@@ -55,6 +59,9 @@ public class PhotoDeSigner extends AbstractDialogFragments {
         for (String line : lines) {
             float len = textPaint.measureText(line);
             y += textPaint.getTextSize();
+
+            float left = (src.getWidth() - len) / 2;
+            canvas.drawRect(left, y - textPaint.getTextSize(), left + len, y, bgPaint);
             //居中
             canvas.drawText(line, (src.getWidth() - len) / 2.0f, y, textPaint);
         }

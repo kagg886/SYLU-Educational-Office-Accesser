@@ -1,6 +1,7 @@
 package com.qlstudio.lite_kagg886.fragment.tools.impl;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -89,8 +90,12 @@ public class PhotoDeSigner extends AbstractDialogFragments {
             activity.getCaller().launch(intent);
 
             new Thread(() -> {
-                clearUriFromAR(activity.getResultBlocked());
-                activity.runOnUiThread(() -> tx.setText(String.format("已选择%d张图片", uris.size())));
+                ActivityResult r = activity.getResultBlocked();
+
+                if (r.getResultCode() == Activity.RESULT_OK) {
+                    clearUriFromAR(r);
+                    activity.runOnUiThread(() -> tx.setText(String.format("已选择%d张图片", uris.size())));
+                }
             }).start();
         });
 
@@ -205,5 +210,6 @@ public class PhotoDeSigner extends AbstractDialogFragments {
                 }
             }
         }
+
     }
 }

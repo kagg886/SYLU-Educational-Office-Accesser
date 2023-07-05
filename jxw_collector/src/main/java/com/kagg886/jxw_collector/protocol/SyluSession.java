@@ -103,6 +103,10 @@ public class SyluSession {
         return "https://jxw.sylu.edu.cn" + captchaLink;
     }
 
+    public void logout() {
+
+    }
+
     public void loginByPwd(String pwd, String captchaCode) {
         initRSAClient();
         client.url(compile("/xtgl/login_slogin.html?time=", new Date().getTime()))

@@ -2,18 +2,20 @@ package com.qlstudio.lite_kagg886.activity;
 
 import android.animation.*;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.graphics.BitmapFactory;
+import android.os.*;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -25,6 +27,7 @@ import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.fragment.AboutFragment;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -159,12 +162,40 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         new Thread(() -> {
             animController.sendEmptyMessage(0);
             try {
-                application.getSession().loginByPwd(pwd.getText().toString());
+                if (application.getSession().needVerifyCode()) {
+                    SyluSession session = application.getSession();
+                    View captchaView = LayoutInflater.from(LoginActivity.this).inflate(R.layout.dialog_captcha, null);
+                    EditText result = captchaView.findViewById(R.id.captcha_res);
+                    ImageView view = captchaView.findViewById(R.id.captcha_img);
+                    view.setImageBitmap(BitmapFactory.decodeStream(session.getClient().url(session.getVerifyLink()).get().bodyStream()));
+
+
+                    AtomicBoolean isCaptchaComplete = new AtomicBoolean(false);
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(LoginActivity.this)
+                            .setTitle("输入验证码")
+                            .setView(captchaView)
+                            .setPositiveButton("确定", (dialog1, which) -> {
+                                isCaptchaComplete.set(true);
+                            });
+                    runOnUiThread(() -> {
+                        dialog.create().show();
+                    });
+
+                    while (!isCaptchaComplete.get()) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            Thread.onSpinWait();
+                        }
+                    }
+                    session.loginByPwd(pwd.getText().toString(),result.getText().toString());
+                } else {
+                    application.getSession().loginByPwd(pwd.getText().toString());
+                }
                 Intent i = new Intent(this, MainActivity.class);
                 startActivity(i);
                 finish();
                 isLogin = false;
             } catch (Exception e) {
+                Log.e(getClass().getName(),"login failed",e);
                 runOnUiThread(() -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("登陆失败");
@@ -184,6 +215,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             animController.sendEmptyMessage(1);
         }).start();
     }
+
     private void inputAnimator(final View view, float w) {
         AnimatorSet set = new AnimatorSet();
         ValueAnimator animator = ValueAnimator.ofFloat(0, w);

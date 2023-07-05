@@ -1,3 +1,4 @@
 .gradle/
 .idea/
 jxw_collector/pwd.txt
+build/

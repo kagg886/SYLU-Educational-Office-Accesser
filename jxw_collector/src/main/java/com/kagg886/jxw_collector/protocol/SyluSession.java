@@ -39,6 +39,8 @@ public class SyluSession {
 
     private boolean isLogin; //最近一次检查登录是否成功
 
+    private String captchaLink; //验证码链接
+
     public SyluSession(String user) {
         client = new HttpClient();
         this.user = user;
@@ -76,8 +78,11 @@ public class SyluSession {
                 new Date().getTime(),
                 "&_=", new Date().getTime()));
         Connection.Response resp = client.get();
-        client.header("Cookie", resp.header("Set-Cookie"))
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+        String cookie = resp.header("Set-Cookie");
+        if (cookie != null) {
+            client.header("Cookie", cookie);
+        }
+        client.header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
         this.rsaSession = JSON.parseObject(resp.body());
     }
 
@@ -87,14 +92,34 @@ public class SyluSession {
 
 
     public void loginByPwd(String pwd) {
+        loginByPwd(pwd, null);
+    }
+
+    public boolean needVerifyCode() {
+        return captchaLink != null;
+    }
+
+    public String getVerifyLink() {
+        return "https://jxw.sylu.edu.cn" + captchaLink;
+    }
+
+    public void loginByPwd(String pwd, String captchaCode) {
         initRSAClient();
         client.url(compile("/xtgl/login_slogin.html?time=", new Date().getTime()))
                 .data("yhm", user).data("mm", RSA.getInstance().encrypt(rsaSession, pwd));
 
+        if (captchaCode != null) {
+            client.data("yzm", captchaCode);
+        }
         Connection.Response resp = client.post();
 
-        Element test = Jsoup.parse(resp.body()).getElementById("tips");
+        Document doc = Jsoup.parse(resp.body());
+        Element test = doc.getElementById("tips");
         if (test != null) {
+            Element captcha = doc.getElementById("yzmPic");
+            if (captcha != null) {
+                captchaLink = "/kaptcha?time=" + new Date().getTime();
+            }
             throw new OfflineException.LoginFailed("登陆失败:" + test.text());
         }
         isLogin = true;

@@ -69,7 +69,9 @@ public class LoginTest {
         SyluSession session = new SyluSession("2203050528");
         session.loginByPwd(pwd);
         session.logout();
-        System.out.println(session.getUserInfo());
+        Assertions.assertThrows(OfflineException.class,() -> {
+            System.out.println(session.getUserInfo());
+        });
 
     }
 }

@@ -150,10 +150,8 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
     }
 
     public void logout() {
-        String stu = GlobalApplication.getApplicationNoStatic().getSession().getStuCode();
-        SyluSession session1 = new SyluSession(new HttpClientProxy());
-        session1.setUser(stu);
-//        GlobalApplication.getApplicationNoStatic().setSession(new SyluSession(new HttpClientProxy()));
+        new Thread(() ->
+                session.logout()).start();
         GlobalApplication.getApplicationNoStatic().getPreferences().edit().putString("pwd", "").apply();
         Intent p = new Intent(getApplicationContext(), LoginActivity.class);
         p.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?

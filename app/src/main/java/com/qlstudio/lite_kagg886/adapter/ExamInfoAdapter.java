@@ -97,7 +97,7 @@ public class ExamInfoAdapter extends RecyclerView.Adapter<ExamInfoAdapter.ExamIn
                         showDetailDialog(holder.root.getContext(), info.getName(), data);
                     });
                 } catch (OfflineException ignored) {
-                    Toast.makeText(v.getContext(), "登录状态已过期，请重新登录", Toast.LENGTH_LONG).show();
+                    GlobalApplication.getCurrentActivity().runOnUiThread(() -> Toast.makeText(v.getContext(), "登录状态已过期，请重新登录", Toast.LENGTH_LONG).show());
                     GlobalApplication.getApplicationNoStatic().logout();
                 }
             }).start();

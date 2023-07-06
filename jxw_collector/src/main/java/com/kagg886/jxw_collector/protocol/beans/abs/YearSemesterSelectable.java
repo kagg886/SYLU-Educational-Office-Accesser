@@ -16,7 +16,7 @@ import java.util.Objects;
  * @package: com.kagg886.jxw_collector.protocol.beans
  * @className: YearSemesterSelectable
  * @author: kagg886
- * @description: TODO
+ * @description: 在页面中体现了学年名和学期名的都需要继承此类
  * @date: 2023/4/14 18:52
  * @version: 1.0
  */

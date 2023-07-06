@@ -36,13 +36,6 @@ public class BaseAPITest {
     }
 
     @Test
-    void testRelateDecode() {
-        SyluSession session = new SyluSession("2203050528");
-        session.loginByPwd(pwd);
-        session.getRelate().forEach(System.out::println);
-    }
-
-    @Test
     void testFastJSON() {
         SyluSession session = new SyluSession("2203050528");
         session.loginByPwd(pwd);

@@ -27,7 +27,9 @@ import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.fragment.AboutFragment;
 
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -160,6 +162,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             application.setSession(new SyluSession(userName.getEditableText().toString()));
         }
         new Thread(() -> {
+            CountDownLatch latch = new CountDownLatch(1);
             animController.sendEmptyMessage(0);
             try {
                 if (application.getSession().needVerifyCode()) {
@@ -169,23 +172,16 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     ImageView view = captchaView.findViewById(R.id.captcha_img);
                     view.setImageBitmap(BitmapFactory.decodeStream(session.getClient().url(session.getVerifyLink()).get().bodyStream()));
 
-
-                    AtomicBoolean isCaptchaComplete = new AtomicBoolean(false);
                     AlertDialog.Builder dialog = new AlertDialog.Builder(LoginActivity.this)
                             .setTitle("输入验证码")
                             .setView(captchaView)
                             .setPositiveButton("确定", (dialog1, which) -> {
-                                isCaptchaComplete.set(true);
+                                latch.countDown();
                             });
                     runOnUiThread(() -> {
                         dialog.create().show();
                     });
-
-                    while (!isCaptchaComplete.get()) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            Thread.onSpinWait();
-                        }
-                    }
+                    latch.await();
                     session.loginByPwd(pwd.getText().toString(),result.getText().toString());
                 } else {
                     application.getSession().loginByPwd(pwd.getText().toString());

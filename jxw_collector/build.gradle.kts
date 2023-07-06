@@ -10,7 +10,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("org.jsoup:jsoup:1.15.3")
-    implementation("com.alibaba:fastjson:1.2.76")
+    implementation("com.alibaba:fastjson:2.0.34")
 }
 
 tasks.test {

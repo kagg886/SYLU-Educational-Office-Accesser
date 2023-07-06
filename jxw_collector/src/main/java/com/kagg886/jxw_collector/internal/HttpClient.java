@@ -4,6 +4,8 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
@@ -82,6 +84,19 @@ public class HttpClient {
 
     public HttpClient data(String k, String v) {
         connection.data(k, v);
+        return this;
+    }
+
+    public Map<String,String> data() {
+        Map<String,String> a = new HashMap<>();
+        connection.request().data().forEach((v) -> {
+            a.put(v.key(),v.value());
+        });
+        return a;
+    }
+
+    public HttpClient data(Map<String,String> map) {
+        connection.data(map);
         return this;
     }
 

@@ -54,10 +54,13 @@ public class ClassSecondFragment extends Fragment {
     private View root;
 
     private View dialogRoot;
+
+    private Button exit;
     Handler twLoginResult = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             Button login = dialogRoot.findViewById(R.id.dialog_classsecedit_login);
+            exit.setEnabled(true);
             switch (msg.what) {
                 case -1:
                     if (!dialog.isShowing()) {
@@ -119,11 +122,12 @@ public class ClassSecondFragment extends Fragment {
             if (TextUtils.isEmpty(pass)) {
                 pass = sp.getString("pwd", null);
             }
+            exit.setEnabled(false); //我没想到会有人在登录的时候关闭弹窗，然后程序就会闪退。。。
             //启动登录
             new Thread(new LoginAction().setPass(pass)).start();
         });
 
-        Button exit = dialogRoot.findViewById(R.id.dialog_classsecedit_exit);
+        exit = dialogRoot.findViewById(R.id.dialog_classsecedit_exit);
 
         exit.setOnClickListener((v) -> {
             dialog.cancel();

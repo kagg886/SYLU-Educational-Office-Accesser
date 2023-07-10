@@ -25,9 +25,13 @@ public class HttpClientProxy extends HttpClient {
     @Override
     public synchronized Connection.Response get() {
         int a = ran.nextInt();
-        log("GET_", a, "->", this);
+        log("GET", "_", a, "->", this);
         Connection.Response resp = super.get();
-        if (!resp.header("Content-Type").startsWith("image")) {
+        if (resp == null || resp.statusCode() != 200) {
+            log("GET_",a,"->","err not response");
+            return resp;
+        }
+        if (!resp.header("Content-Type").contains("image")) {
             log("GET_", a, "_RESP->", resp.body());
         } else {
             log("GET_", a, "_RESP->[Image:", resp.url().toString(), "]");
@@ -38,9 +42,17 @@ public class HttpClientProxy extends HttpClient {
     @Override
     public synchronized Connection.Response post() {
         int a = ran.nextInt();
-        log("GET_", a, "->", this);
+        log("POST_", a, "->", this);
         Connection.Response resp = super.post();
-        log("GET_", a, "_RESP->", resp.body());
+        if (resp == null || resp.statusCode() != 200) {
+            log("POST_",a,"->","err not response");
+            return resp;
+        }
+        if (!resp.header("Content-Type").contains("image")) {
+            log("POST_", a, "_RESP->", resp.body());
+        } else {
+            log("POST_", a, "_RESP->[Image:", resp.url().toString(), "]");
+        }
         return resp;
     }
 

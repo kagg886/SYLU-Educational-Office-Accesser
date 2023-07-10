@@ -75,6 +75,9 @@ public class SyluSession {
                 new Date().getTime(),
                 "&_=", new Date().getTime()));
         Connection.Response resp = client.get();
+        if (resp == null) {
+            throw new IllegalStateException("无法获得通信密钥，这可能是教务网的问题\n请检查教务网网页端能够正常进入。");
+        }
         String cookie = resp.header("Set-Cookie");
         if (cookie != null) {
             client.header("Cookie", cookie);

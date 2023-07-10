@@ -39,6 +39,10 @@ public class HttpClient {
         }
     }
 
+    public Connection.Method getMethod() {
+        return connection.request().method();
+    }
+
     public HttpClient setCookie(String k, String v) {
         connection.cookie(k, v);
         return this;

@@ -2,10 +2,12 @@ package com.qlstudio.lite_kagg886.activity;
 
 import android.animation.*;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,8 +30,6 @@ import com.qlstudio.lite_kagg886.fragment.AboutFragment;
 
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @projectName: 掌上沈理青春版
@@ -175,6 +175,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(LoginActivity.this)
                             .setTitle("输入验证码")
                             .setView(captchaView)
+                            .setOnCancelListener(dialog12 -> {
+                                throw new RuntimeException("验证码被用户取消");
+                                //TODO 待测试
+                            })
                             .setPositiveButton("确定", (dialog1, which) -> {
                                 latch.countDown();
                             });
@@ -182,7 +186,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                         dialog.create().show();
                     });
                     latch.await();
-                    session.loginByPwd(pwd.getText().toString(),result.getText().toString());
+                    session.loginByPwd(pwd.getText().toString(), result.getText().toString());
                 } else {
                     application.getSession().loginByPwd(pwd.getText().toString());
                 }
@@ -191,19 +195,17 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 finish();
                 isLogin = false;
             } catch (Exception e) {
-                Log.e(getClass().getName(),"login failed",e);
+                Log.e(getClass().getName(), "login failed", e);
                 runOnUiThread(() -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("登陆失败");
-                    if (e instanceof NullPointerException) {
-                        builder.setMessage("无法连接到教务网，请检查网络状态后重试");
-                    } else if ((e instanceof OfflineException)) {
+                    if ((e instanceof OfflineException)) {
                         builder.setMessage(e.getMessage());
                         builder.setPositiveButton("找回密码", (dialog, which) -> AboutFragment.openUrlByBrowser("https://jxw.sylu.edu.cn/pwdmgr/retake/index.zf"));
                     } else if (Objects.requireNonNull(e.getMessage()).contains("Read timeout")) {
                         builder.setMessage("连接超时!请检查网络状态后重试");
                     } else {
-                        builder.setMessage("未知错误:" + e.getMessage());
+                        builder.setMessage(e.getMessage());
                     }
                     builder.create().show();
                 });

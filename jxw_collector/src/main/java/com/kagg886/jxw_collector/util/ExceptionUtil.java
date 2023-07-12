@@ -21,13 +21,22 @@ public class ExceptionUtil {
         while (System.currentTimeMillis() - now < delays) {
             try {
                 return func.get();
-            } catch (Exception ignored) {
-                ignored.printStackTrace();
-                if (ignored instanceof OfflineException) {
-                    throw ignored;
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (e instanceof OfflineException) {
+                    throw e;
+                }
+                if (e instanceof Ignored) {
+                    throw ((RuntimeException) e.getCause());
                 }
             }
         }
         return null;
+    }
+
+    public static class Ignored extends RuntimeException {
+        public Ignored(Throwable cause) {
+            super(cause);
+        }
     }
 }

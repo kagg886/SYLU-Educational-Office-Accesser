@@ -36,6 +36,8 @@ import java.util.List;
  */
 public class ExamInfoAdapter extends RecyclerView.Adapter<ExamInfoAdapter.ExamInfoHolder> {
 
+    private volatile boolean isShowing = false;
+
     private final ExamResult result;
 
     public ExamInfoAdapter(ExamResult result) {
@@ -67,6 +69,7 @@ public class ExamInfoAdapter extends RecyclerView.Adapter<ExamInfoAdapter.ExamIn
 
         builder.setView(view);
         builder.create().show();
+        isShowing = false;
     }
 
     private final List<ExamResult.ExamInfo> results = new ArrayList<ExamResult.ExamInfo>() {
@@ -90,6 +93,11 @@ public class ExamInfoAdapter extends RecyclerView.Adapter<ExamInfoAdapter.ExamIn
     public void onBindViewHolder(@NonNull @NotNull ExamInfoHolder holder, int position) {
         ExamResult.ExamInfo info = results.get(position);
         holder.root.setOnClickListener((v -> {
+            if (isShowing) {
+                Toast.makeText(GlobalApplication.getApplicationNoStatic(), "正在查询某一科目，请等待弹窗出现后再试", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            isShowing = true;
             new Thread(() -> {
                 try {
                     List<List<String>> data = result.queryDetailsByExamInfo(info);

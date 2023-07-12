@@ -157,8 +157,6 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
     private void updateUI(List<ExamResult.ExamInfo> info) {
         new Handler(Looper.getMainLooper()).post(() -> {
             adapter.getResults().clear();
-            //TODO 名字过长会导致布局错位，亟待解决
-//            Toast.makeText(getActivity(), "共找到:" + info.size() + "条信息", Toast.LENGTH_SHORT).show();
             info.forEach((a) -> {
                 adapter.getResults().add(a);
             });

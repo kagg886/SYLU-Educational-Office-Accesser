@@ -40,7 +40,12 @@ public class ClassTable extends ArrayList<ClassTable.ClassUnit> {
                     .data("xnm", xnm).data("xqm", xqm)
                     .data("kzlx", "ck").data("xsdm", "");
             Connection.Response resp = client.post();
-            return JSON.parseObject(resp.body()).getJSONArray("kbList");
+
+            JSONArray object = JSON.parseObject(resp.body()).getJSONArray("kbList");
+            if (object.size() == 0) {
+                throw new ExceptionUtil.Ignored(new IllegalStateException("该学年学期的课表尚未开放!"));
+            }
+            return object;
         }, 30000);
         array.forEach((obj) -> {
             JSONObject object = ((JSONObject) obj);

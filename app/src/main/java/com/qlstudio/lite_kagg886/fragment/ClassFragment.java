@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -83,20 +85,25 @@ public class ClassFragment extends Fragment {
             if (preferences.getLong("cache_deadline_class", 0) - System.currentTimeMillis() <= 0) {
                 try {
                     schedule = GlobalApplication.getApplicationNoStatic().getSession().getSchedule();
-                    table = schedule.queryClassByYearAndTerm(schedule.getDefaultYears(), schedule.getDefaultTeamVal());
                     calendar = GlobalApplication.getApplicationNoStatic().getSession().getSchoolCalendar();
+                    table = schedule.queryClassByYearAndTerm(schedule.getDefaultYears(), schedule.getDefaultTeamVal());
+
+                    preferences.edit()
+                            //一小时为3600000毫秒，所以初始值是180小时即7天半
+                            .putLong("cache_deadline_class", System.currentTimeMillis() + life * 3600000)
+                            .putString("cache_schedule", JSON.toJSONString(schedule))
+                            .putString("cache_calendar", JSON.toJSONString(calendar))
+                            .putString("cache_table", JSON.toJSONString(table))
+                            .apply();
                 } catch (OfflineException e) {
                     GlobalApplication.getApplicationNoStatic().logout();
                     return;
+                } catch (IllegalStateException e) {
+                    GlobalApplication.getCurrentActivity().runOnUiThread(() -> {
+                        Toast.makeText(GlobalApplication.getApplicationNoStatic(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                    return;
                 }
-                preferences.edit()
-                        //一小时为3600000毫秒，所以初始值是180小时即7天半
-                        .putLong("cache_deadline_class", System.currentTimeMillis() + life * 3600000)
-                        .putString("cache_schedule", JSON.toJSONString(schedule))
-                        .putString("cache_calendar", JSON.toJSONString(calendar))
-                        .putString("cache_table", JSON.toJSONString(table))
-                        .apply();
-
             } else {
                 schedule = JSON.parseObject(preferences.getString("cache_schedule", null), Schedule.class);
                 schedule.setSession(GlobalApplication.getApplicationNoStatic().getSession());

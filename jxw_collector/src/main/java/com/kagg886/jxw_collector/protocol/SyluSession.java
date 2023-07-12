@@ -292,18 +292,22 @@ public class SyluSession {
         return new UserInfo(compile(avt), name, clazz);
     }
 
+    //获取必评列表
     public RelateManager getMustRelates() {
         return new RelateManager(this);
     }
 
+    //获取校历
     public SchoolCalendar getSchoolCalendar() {
         return new SchoolCalendar(this);
     }
 
+    //获取考试结果
     public ExamResult getExamResult() {
         return new ExamResult(this);
     }
 
+    //获取课程表
     public Schedule getSchedule() {
         return new Schedule(this);
     }

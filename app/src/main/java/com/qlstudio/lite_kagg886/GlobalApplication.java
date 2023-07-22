@@ -41,6 +41,12 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
 
     private SharedPreferences preferences; //本地管理器
 
+    private LogCatcher catcher; //日志抓取器线程
+
+    public LogCatcher getCatcher() {
+        return catcher;
+    }
+
     @SuppressLint("PrivateApi")
     public static GlobalApplication getApplicationNoStatic() {
         Application application = null;
@@ -84,7 +90,7 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
     }
 
     public File getLoggerBase() {
-        return new File(getFilesDir(), "log");
+        return new File(getCacheDir(), "log");
     }
 
     @SuppressLint("DefaultLocale")
@@ -111,7 +117,8 @@ public class GlobalApplication extends Application implements Thread.UncaughtExc
         } while (log.exists());
         try {
             log.createNewFile();
-            new LogCatcher(log).start();
+            catcher = new LogCatcher(log);
+            catcher.start();
         } catch (IOException e) {
             System.out.println(log.getAbsolutePath());
             throw new RuntimeException(e);

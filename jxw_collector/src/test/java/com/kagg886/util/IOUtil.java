@@ -51,7 +51,7 @@ public class IOUtil {
      * 删除文件
      * */
     public static void delFile(File f) {
-        delFile(f,emptyFilter);
+        delFile(f, emptyFilter);
     }
 
     /*
@@ -61,7 +61,7 @@ public class IOUtil {
      * @description 删除文件，但是有过滤器
      * @date 2023/03/13 17:12
      */
-    public static void delFile(File f,FileFilter filter) {
+    public static void delFile(File f, FileFilter filter) {
         if (!f.isDirectory()) {
             f.delete();
             return;

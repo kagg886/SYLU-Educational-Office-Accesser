@@ -19,7 +19,14 @@ public class LogCatcher extends Thread {
 
     private final BufferedReader reader;
 
+    private File file;
+
+    public File getFile() {
+        return file;
+    }
+
     public LogCatcher(File write) throws IOException {
+        this.file = write;
         this.writer = new BufferedWriter(new FileWriter(write));
         Process process = Runtime.getRuntime().exec(new String[]{"logcat", "-v", "threadtime", "TAG:*"});
         reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

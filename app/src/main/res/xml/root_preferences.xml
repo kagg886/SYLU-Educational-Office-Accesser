@@ -40,6 +40,12 @@
                 android:key="setting_cache"/>
 
         <Preference
+                android:key="setting_remove_log"
+                app:summary="已发现0mb"
+                app:title="清除缓存">
+        </Preference>
+
+        <Preference
                 android:key="setting_update_now"
                 app:summary="重置缓存状态"
                 app:title="通知EOA客户端更新缓存">

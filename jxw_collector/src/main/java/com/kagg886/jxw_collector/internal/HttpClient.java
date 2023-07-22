@@ -91,15 +91,15 @@ public class HttpClient {
         return this;
     }
 
-    public Map<String,String> data() {
-        Map<String,String> a = new HashMap<>();
+    public Map<String, String> data() {
+        Map<String, String> a = new HashMap<>();
         connection.request().data().forEach((v) -> {
-            a.put(v.key(),v.value());
+            a.put(v.key(), v.value());
         });
         return a;
     }
 
-    public HttpClient data(Map<String,String> map) {
+    public HttpClient data(Map<String, String> map) {
         connection.data(map);
         return this;
     }

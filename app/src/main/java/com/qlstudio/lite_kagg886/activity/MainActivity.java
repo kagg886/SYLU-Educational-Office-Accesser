@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         GlobalApplication.getApplicationNoStatic().getPreferences().edit()
                 .putBoolean("setting_nullfail", false)
-                .apply();
+                .apply(); //关闭 不显示挂科考试项 设置
 
         new Thread(() -> {
             SyluSession session = GlobalApplication.getApplicationNoStatic().getSession();

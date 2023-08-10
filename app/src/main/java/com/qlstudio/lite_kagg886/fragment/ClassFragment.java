@@ -99,7 +99,7 @@ public class ClassFragment extends Fragment {
                     return;
                 } catch (IllegalStateException e) {
                     GlobalApplication.getCurrentActivity().runOnUiThread(() -> {
-                        adapter.getData().add(new Empty(e));
+                        adapter.getData().add(new Empty(e.getMessage()));
                         spinner.setVisibility(View.INVISIBLE);
                     });
 
@@ -118,12 +118,14 @@ public class ClassFragment extends Fragment {
             int a = 0;
             ClassTable perWeek;
             LocalDate date = calendar.getStart();
-            while ((perWeek = table.queryClassByWeek(a + 1)).size() != 0) {
-                final ClassTable perWeek0 = perWeek;
-                final LocalDate date0 = date;
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    adapter.getData().add(new ClassPerWeekFragment(perWeek0, date0));
-                });
+            while ((perWeek = table.queryClassByWeek(a + 1)).size() != 0 || date.isBefore(calendar.getEnd())) { //十一假期会空一周，此时会满足perWeek.size()==0但不是最后一周
+                if (perWeek.size() == 0) {
+                    new Handler(Looper.getMainLooper()).post(() -> adapter.getData().add(new Empty("本周无课程!")));
+                } else {
+                    final ClassTable perWeek0 = perWeek;
+                    final LocalDate date0 = date;
+                    new Handler(Looper.getMainLooper()).post(() -> adapter.getData().add(new ClassPerWeekFragment(perWeek0, date0)));
+                }
                 a++;
                 date = date.plusDays(7);
 //                break; //仅仅拿第一周做测试，
@@ -160,10 +162,10 @@ public class ClassFragment extends Fragment {
 
 
     public static class Empty extends Fragment {
-        private final Throwable e;
+        private final String msg;
 
-        public Empty(Throwable e) {
-            this.e = e;
+        public Empty(String e) {
+            this.msg = e;
         }
 
         @Nullable
@@ -173,7 +175,7 @@ public class ClassFragment extends Fragment {
             View v = LayoutInflater.from(getContext()).inflate(R.layout.adapter_tools, null);
             ToolsAdapter.TableUnit u = new ToolsAdapter.TableUnit(v);
             u.img.setImageResource(R.drawable.ic_tools_empty);
-            u.txt.setText(e.getMessage());
+            u.txt.setText(msg);
             return v;
         }
     }

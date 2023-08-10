@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class ClassTableAdapter extends RecyclerView.Adapter<ClassTableAdapter.TableUnit> implements View.OnClickListener {
 
-    private final List<ClassTable.ClassUnit> list = new ArrayList<ClassTable.ClassUnit>() {
+    private final List<ClassTable.ClassUnit> list = new ArrayList<>() {
         @Override
         public boolean add(ClassTable.ClassUnit classUnit) {
             boolean a = super.add(classUnit);

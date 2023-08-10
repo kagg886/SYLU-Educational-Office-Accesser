@@ -66,9 +66,12 @@ public class ClassPerWeekFragment extends Fragment {
     @org.jetbrains.annotations.Nullable
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        View v = LayoutInflater.from(getContext()).inflate(R.layout.fragment_classperweek, null);
-        contain = v.findViewById(R.id.fragment_classperweek_container);
+        //根布局的复杂程度与加载速度直接挂钩
+//        View v = LayoutInflater.from(getContext()).inflate(R.layout.fragment_classperweek, null);
+
+        contain = new RecyclerView(getActivity());
         contain.setRecycledViewPool(pool); //复用Pool缓存池，提高加载效率
+        contain.setHasFixedSize(true); //不触发视图绘制，提高效率
         GridLayoutManager manager = new GridLayoutManager(getContext(), 8); //一周七天，外加一个显示第几节课的View，所以是8
 
         contain.setLayoutManager(manager);
@@ -95,6 +98,6 @@ public class ClassPerWeekFragment extends Fragment {
             }
         }
         contain.setAdapter(adapter);
-        return v;
+        return contain;
     }
 }

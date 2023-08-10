@@ -20,8 +20,7 @@ public class ToolsFragment extends Fragment {
     @org.jetbrains.annotations.Nullable
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        View v = LayoutInflater.from(getContext()).inflate(R.layout.fragment_classperweek, null);
-        RecyclerView root = v.findViewById(R.id.fragment_classperweek_container);
+        RecyclerView root = new RecyclerView(getContext());
         root.setLayoutManager(new GridLayoutManager(getContext(), 3));
         root.setAdapter(new ToolsAdapter());
 
@@ -29,6 +28,6 @@ public class ToolsFragment extends Fragment {
         gridItemDecoration.setColor(Color.parseColor("#E0E0E0"));
         root.addItemDecoration(gridItemDecoration);
 
-        return v;
+        return root;
     }
 }

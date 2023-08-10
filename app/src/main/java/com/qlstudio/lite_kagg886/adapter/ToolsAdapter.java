@@ -59,8 +59,8 @@ public class ToolsAdapter extends RecyclerView.Adapter<ToolsAdapter.TableUnit> {
     }
 
     public static class TableUnit extends RecyclerView.ViewHolder {
-        private final ImageView img;
-        private final TextView txt;
+        public final ImageView img;
+        public final TextView txt;
 
 
         public TableUnit(@NonNull @NotNull View itemView) {

@@ -5,14 +5,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -25,6 +23,7 @@ import com.kagg886.jxw_collector.protocol.beans.SchoolCalendar;
 import com.qlstudio.lite_kagg886.GlobalApplication;
 import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.adapter.ContentPagerAdapter;
+import com.qlstudio.lite_kagg886.adapter.ToolsAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
@@ -100,8 +99,10 @@ public class ClassFragment extends Fragment {
                     return;
                 } catch (IllegalStateException e) {
                     GlobalApplication.getCurrentActivity().runOnUiThread(() -> {
-                        Toast.makeText(GlobalApplication.getApplicationNoStatic(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        adapter.getData().add(new Empty(e));
+                        spinner.setVisibility(View.INVISIBLE);
                     });
+
                     return;
                 }
             } else {
@@ -157,4 +158,23 @@ public class ClassFragment extends Fragment {
         return v;
     }
 
+
+    public static class Empty extends Fragment {
+        private final Throwable e;
+
+        public Empty(Throwable e) {
+            this.e = e;
+        }
+
+        @Nullable
+        @org.jetbrains.annotations.Nullable
+        @Override
+        public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+            View v = LayoutInflater.from(getContext()).inflate(R.layout.adapter_tools, null);
+            ToolsAdapter.TableUnit u = new ToolsAdapter.TableUnit(v);
+            u.img.setImageResource(R.drawable.ic_tools_empty);
+            u.txt.setText(e.getMessage());
+            return v;
+        }
+    }
 }

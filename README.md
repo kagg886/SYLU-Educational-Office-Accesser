@@ -20,13 +20,13 @@
 
 ## 3. 演示截图
 
-![登录页面](img\5d9e923844961c99bf4c318e7ad8d072.jpg)
+![登录页面](img/5d9e923844961c99bf4c318e7ad8d072.jpg)
 
-![课程表](img\3854fc4b7c6147eeb93cd853b05a6876.jpg)
+![课程表](img/3854fc4b7c6147eeb93cd853b05a6876.jpg)
 
-![考试信息](img\ba8f816bef813e8090dcbb81d00f69bc.jpg)
+![考试信息](img/ba8f816bef813e8090dcbb81d00f69bc.jpg)
 
-![版本信息](img\28212eda113b8f41ba4098a2c77e725f.jpg)
+![版本信息](img/28212eda113b8f41ba4098a2c77e725f.jpg)
 
 ## 4. 声明
 

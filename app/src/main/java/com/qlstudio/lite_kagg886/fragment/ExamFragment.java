@@ -23,6 +23,7 @@ import com.qlstudio.lite_kagg886.R;
 import com.qlstudio.lite_kagg886.adapter.ExamInfoAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -96,7 +97,7 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
                 this.container.addItemDecoration(new DividerItemDecoration(Objects.requireNonNull(getContext()), DividerItemDecoration.VERTICAL));
 
                 //选定选择器
-                String[] yearArr = result.getYears().keySet().toArray(new String[0]);
+                String[] yearArr = result.getYears().keySet().stream().sorted(Comparator.comparingInt(k -> Integer.parseInt(k.split("-")[0]))).toArray(String[]::new);
                 choose_year.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, yearArr));
                 for (int i = 0; i < yearArr.length; i++) {
                     if (yearArr[i].equals(result.getDefaultYears())) {

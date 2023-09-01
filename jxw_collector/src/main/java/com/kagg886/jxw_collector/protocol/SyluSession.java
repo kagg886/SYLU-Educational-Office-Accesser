@@ -6,7 +6,6 @@ import com.kagg886.jxw_collector.exceptions.OfflineException;
 import com.kagg886.jxw_collector.internal.HttpClient;
 import com.kagg886.jxw_collector.internal.RSA;
 import com.kagg886.jxw_collector.protocol.beans.*;
-import com.kagg886.jxw_collector.protocol.beans.relate.RelateManager;
 import com.kagg886.jxw_collector.util.ExceptionUtil;
 import com.kagg886.jxw_collector.util.ParamUtil;
 import org.jsoup.Connection;
@@ -129,7 +128,6 @@ public class SyluSession {
             throw new OfflineException.LoginFailed("登陆失败:" + test.text());
         }
     }
-
     public void loginByCookie(String cookie) {
         client.header("Cookie", cookie);
         assertLogin();
@@ -290,11 +288,6 @@ public class SyluSession {
         String name = document.getElementsByTag("h4").text();
         String clazz = document.getElementsByTag("p").text();
         return new UserInfo(compile(avt), name, clazz);
-    }
-
-    //获取必评列表
-    public RelateManager getMustRelates() {
-        return new RelateManager(this);
     }
 
     //获取校历

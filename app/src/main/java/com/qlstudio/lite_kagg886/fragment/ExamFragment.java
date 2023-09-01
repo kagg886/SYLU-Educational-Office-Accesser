@@ -97,7 +97,13 @@ public class ExamFragment extends Fragment implements AdapterView.OnItemSelected
                 this.container.addItemDecoration(new DividerItemDecoration(Objects.requireNonNull(getContext()), DividerItemDecoration.VERTICAL));
 
                 //选定选择器
-                String[] yearArr = result.getYears().keySet().stream().sorted(Comparator.comparingInt(k -> Integer.parseInt(k.split("-")[0]))).toArray(String[]::new);
+                String[] yearArr = result.getYears().keySet().stream().sorted(Comparator.comparingInt(k -> {
+                    try {
+                        return -Integer.parseInt(k.split("-")[0]);
+                    } catch (Exception e) {
+                        return -114514;
+                    }
+                })).toArray(String[]::new);
                 choose_year.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, yearArr));
                 for (int i = 0; i < yearArr.length; i++) {
                     if (yearArr[i].equals(result.getDefaultYears())) {

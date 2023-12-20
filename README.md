@@ -1,5 +1,7 @@
 # 沈理教务青春版
 
+# 2.0分支请前往https://gitee.com/kagg886/sylu-educational-office-accesser查看
+
 ## 1. 起因
 
 掌上沈理废了，琴理没了，看不了实时课表了；

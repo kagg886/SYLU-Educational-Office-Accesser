@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SYLU_EOA</string>
+    <string name="title_activity_setting">SettingActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
+</resources>

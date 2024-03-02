@@ -5,6 +5,7 @@ import com.kagg886.sylu_eoa.api.v2.LoginFailedException
 import com.kagg886.sylu_eoa.api.v2.SyluUser
 import com.kagg886.sylu_eoa.api.v2.network.InFileCookieSerializer
 import com.kagg886.sylu_eoa.getApp
+import com.kagg886.sylu_eoa.toast
 import com.kagg886.sylu_eoa.ui.model.BaseViewModel
 import com.kagg886.sylu_eoa.util.*
 import kotlinx.coroutines.delay
@@ -109,7 +110,19 @@ class SyluUserViewModel : BaseViewModel<SyluUser>() {
         if (user.isLogin()) {
             return user
         }
-
+//
+//        kotlin.runCatching {
+//            //尝试检查在线，若在线返回User
+//            if (user.isLogin()) {
+//                return user
+//            }
+//        }.onFailure {
+//            //网络波动错误，自动开启离线模式
+//            _skipCheckLogin.value = true
+//
+//            getApp().toast("网络错误，强制开启离线模式")
+//            return user
+//        }
         //不在线尝试登录。若报错则抛异常
         user.login(password0)
         return user

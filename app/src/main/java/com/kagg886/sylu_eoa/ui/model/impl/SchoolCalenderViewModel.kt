@@ -40,17 +40,21 @@ class SchoolCalenderViewModel : BaseViewModel<SchoolCalender>() {
     fun loadData(user: SyluUser) {
         setDataLoading()
         viewModelScope.launch {
-            val list = context.getConfig(SchoolCalenderBean).first()
-            val expire = context.getConfig(SchoolCalenderBeanExpire).first()
-            if ((expire == -1L) && (list.isEmpty() || System.currentTimeMillis() > expire)) {
-                val day = context.getConfig(DayExpired).first()
-                val list = user.getSchoolCalender()
-                setDataLoadSuccess(list)
-                context.updateConfig(SchoolCalenderBean, Json.encodeToString(list))
-                context.updateConfig(SchoolCalenderBeanExpire, System.currentTimeMillis() + day * 864_000_00)
-                return@launch
+            runCatching {
+                val list = context.getConfig(SchoolCalenderBean).first()
+                val expire = context.getConfig(SchoolCalenderBeanExpire).first()
+                if ((expire == -1L) && (list.isEmpty() || System.currentTimeMillis() > expire)) {
+                    val day = context.getConfig(DayExpired).first()
+                    val list = user.getSchoolCalender()
+                    setDataLoadSuccess(list)
+                    context.updateConfig(SchoolCalenderBean, Json.encodeToString(list))
+                    context.updateConfig(SchoolCalenderBeanExpire, System.currentTimeMillis() + day * 864_000_00)
+                    return@launch
+                }
+                setDataLoadSuccess(json.decodeFromString<SchoolCalender>(list))
+            }.onFailure {
+                setDataLoadError(it)
             }
-            setDataLoadSuccess(json.decodeFromString<SchoolCalender>(list))
         }
     }
 

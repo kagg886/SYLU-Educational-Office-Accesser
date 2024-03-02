@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kagg886.sylu_eoa.api.v2.bean.findClassByWeek
 import com.kagg886.sylu_eoa.ui.componment.ClassPage
+import com.kagg886.sylu_eoa.ui.componment.ErrorPage
 import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.model.LoadingState.*
 import com.kagg886.sylu_eoa.ui.model.impl.ClassTableViewModel
@@ -161,8 +162,8 @@ fun ClassTablePage() {
                 return
             }
             val err by tableModel.error.collectAsState()
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Error!\n${err?.stackTraceToString()}")
+            ErrorPage(ex = err) {
+                tableModel.clearLoading()
             }
         }
     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
@@ -31,6 +32,7 @@ import com.kagg886.sylu_eoa.SettingActivity
 import com.kagg886.sylu_eoa.getApp
 import com.kagg886.sylu_eoa.toast
 import com.kagg886.sylu_eoa.ui.componment.Details
+import com.kagg886.sylu_eoa.ui.componment.ErrorPage
 import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.model.LoadingState
 import com.kagg886.sylu_eoa.ui.model.impl.ProfileViewModel
@@ -38,6 +40,8 @@ import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
 
 @Composable
 fun MePage() {
+
+    val avt = LocalContext.current
     val userModel: SyluUserViewModel = viewModel(viewModelStoreOwner = LocalContext.current as ViewModelStoreOwner)
     val profileModel: ProfileViewModel = viewModel(viewModelStoreOwner = LocalContext.current as ViewModelStoreOwner)
 
@@ -60,7 +64,9 @@ fun MePage() {
 
         LoadingState.SUCCESS -> {
             Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Card(modifier = Modifier.fillMaxWidth(0.75f).padding(top = 30.dp, bottom = 30.dp)) {
+                Card(modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .padding(top = 30.dp, bottom = 30.dp)) {
                     val profile = profile!!
                     val byte = profile.avatar
                     Row(modifier = Modifier.height(120.dp)) {
@@ -107,8 +113,6 @@ fun MePage() {
                     }
                 }
 
-                val avt = LocalContext.current
-
                 var exitDialog by remember {
                     mutableStateOf(false)
                 }
@@ -139,7 +143,7 @@ fun MePage() {
                     ListItem(headlineContent = {
                         Text("退出登录")
                     }, leadingContent = {
-                        Icon(imageVector = Icons.Outlined.ExitToApp, contentDescription = "")
+                        Icon(imageVector = Icons.AutoMirrored.Outlined.ExitToApp, contentDescription = "")
                     }, modifier = Modifier.clickable {
                         exitDialog = true
                     })
@@ -169,9 +173,67 @@ fun MePage() {
                 Loading()
                 return
             }
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Error!\n${err?.stackTraceToString()}")
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                ErrorPage(ex = err, modifier = Modifier.weight(0.2f)) {
+                    profileModel.clearLoading()
+                }
+
+                HorizontalDivider()
+
+                Column(modifier = Modifier.fillMaxSize(0.9f).weight(0.8f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    var exitDialog by remember {
+                        mutableStateOf(false)
+                    }
+
+                    if (exitDialog) {
+                        AlertDialog(onDismissRequest = {
+                            exitDialog = false
+                        }, confirmButton = {
+                            TextButton(onClick = {
+                                userModel.clearLogin()
+                                getApp().toast("退出登录成功!")
+                            }) {
+                                Text("确定")
+                            }
+                        }, dismissButton = {
+                            TextButton(onClick = {
+                                exitDialog = false
+                            }) {
+                                Text("取消")
+                            }
+                        }, title = {
+                            Text("退出登录")
+                        }, text = {
+                            Text("这么做会清空登录信息并重新登录，确定要这么做吗？")
+                        })
+                    }
+
+
+                    ListItem(headlineContent = {
+                        Text("退出登录")
+                    }, leadingContent = {
+                        Icon(imageVector = Icons.AutoMirrored.Outlined.ExitToApp, contentDescription = "")
+                    }, modifier = Modifier.clickable {
+                        exitDialog = true
+                    })
+                    ListItem(headlineContent = {
+                        Text("设置")
+                    }, leadingContent = {
+                        Icon(imageVector = Icons.Outlined.Settings, contentDescription = "")
+                    }, modifier = Modifier.clickable {
+                        avt.startActivity(Intent(avt, SettingActivity::class.java))
+                    })
+                    ListItem(headlineContent = {
+                        Text("关于")
+                    }, leadingContent = {
+                        Icon(imageVector = Icons.Outlined.Star, contentDescription = "")
+                    }, modifier = Modifier.clickable {
+                        avt.startActivity(Intent(avt,AboutActivity::class.java))
+                    })
+                }
             }
+
         }
     }
 }

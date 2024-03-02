@@ -29,6 +29,7 @@ import com.kagg886.sylu_eoa.ui.model.impl.AppOnlineConfigViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
 import com.kagg886.sylu_eoa.ui.theme.SYLU_EOATheme
 import com.kagg886.utils.createLogger
+import okio.IOException
 import kotlin.system.exitProcess
 
 private val log = createLogger("MainActivity")
@@ -146,7 +147,9 @@ fun Main() {
         }, title = {
             Text("App遇到了崩溃错误!")
         }, text = {
-            Column(modifier = Modifier.fillMaxHeight(0.7f).verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier
+                .fillMaxHeight(0.7f)
+                .verticalScroll(rememberScrollState())) {
                 Text("详细信息请长按复制以下路径，然后前往文件管理器查看。")
                 SelectionContainer {
                     Text(f, fontWeight = FontWeight.Bold, fontSize = 20.sp)
@@ -188,6 +191,13 @@ fun Main() {
             if (err?.message != "未登录") {
                 var dialog by remember {
                     mutableStateOf(true)
+                }
+
+                if (err is IOException) {
+                    syluUserViewModel.setSkipCheckLogin(true)
+                    syluUserViewModel.clearLoading()
+                    LocalContext.current.toast("网络连接失败，自动开启离线模式!")
+                    return
                 }
 
                 if (dialog) {

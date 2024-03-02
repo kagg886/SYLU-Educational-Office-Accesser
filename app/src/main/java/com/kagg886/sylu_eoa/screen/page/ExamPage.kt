@@ -23,6 +23,7 @@ import com.kagg886.sylu_eoa.api.v2.bean.ExamStatus.*
 import com.kagg886.sylu_eoa.api.v2.bean.TERM_ALL_PICKER
 import com.kagg886.sylu_eoa.api.v2.bean.findListByTerm
 import com.kagg886.sylu_eoa.ui.componment.Details
+import com.kagg886.sylu_eoa.ui.componment.ErrorPage
 import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.model.LoadingState
 import com.kagg886.sylu_eoa.ui.model.impl.ExamDetailsViewModel
@@ -146,8 +147,8 @@ fun ExamContainer() {
                 Loading()
                 return
             }
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Error!\n${err?.stackTraceToString()}")
+            ErrorPage(ex = err) {
+                examViewModel.clearLoading()
             }
         }
     }
@@ -223,9 +224,8 @@ fun PickerContainer() {
                 Loading()
                 return
             }
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                err?.printStackTrace()
-                Text("Error!\n${err?.stackTraceToString()}")
+            ErrorPage(ex = err) {
+                pickerViewModel.clearLoading()
             }
         }
     }

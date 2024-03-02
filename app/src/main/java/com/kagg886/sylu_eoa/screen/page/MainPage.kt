@@ -20,6 +20,7 @@ import com.kagg886.sylu_eoa.R
 import com.kagg886.sylu_eoa.api.v2.bean.ClassUnit
 import com.kagg886.sylu_eoa.api.v2.bean.findClassByWeek
 import com.kagg886.sylu_eoa.ui.componment.ClassDialog
+import com.kagg886.sylu_eoa.ui.componment.ErrorPage
 import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.model.LoadingState
 import com.kagg886.sylu_eoa.ui.model.impl.ClassTableViewModel
@@ -47,7 +48,10 @@ fun getTips(): Pair<String, String> {
 @Composable
 fun MainPage() {
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Column(modifier = Modifier.fillMaxWidth().weight(0.2f, fill = true).padding(start = 25.dp)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .weight(0.2f, fill = true)
+            .padding(start = 25.dp)) {
             val (a, b) = getTips()
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(imageVector = Icons.Outlined.Email, contentDescription = "")
@@ -56,7 +60,9 @@ fun MainPage() {
             Text(b, modifier = Modifier.padding(top = 20.dp))
         }
         Box(modifier = Modifier.weight(0.8f, fill = true), contentAlignment = Alignment.TopCenter) {
-            Card(modifier = Modifier.fillMaxWidth(0.8f).fillMaxHeight()) {
+            Card(modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .fillMaxHeight()) {
                 ClassSummary()
             }
         }
@@ -105,8 +111,8 @@ fun ClassSummary() {
                 return
             }
             val err by tableModel.error.collectAsState()
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Error!\n${err?.stackTraceToString()}")
+            ErrorPage(ex = err) {
+                tableModel.clearLoading()
             }
         }
     }
@@ -163,9 +169,13 @@ fun TimeLineTable(data: List<ClassUnit>) {
             ClassDialog(onDismiss = { dialog = false }, unit = unit, dialog = dialog)
 
             Card(
-                modifier = Modifier.fillMaxWidth(0.8f).height(height = 90.dp).padding(3.dp).clickable {
-                    dialog = true
-                },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(height = 90.dp)
+                    .padding(3.dp)
+                    .clickable {
+                        dialog = true
+                    },
                 colors = CardDefaults.cardColors(
                     containerColor = Color(unit.name.hashCode())
                 )

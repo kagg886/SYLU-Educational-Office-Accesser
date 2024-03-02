@@ -26,7 +26,7 @@ class AppOnlineConfigViewModel: BaseViewModel<UpdateInfo>() {
 
         val oldAnn = app.getConfig(Announcement).first()
 
-        val newAnn = client.execute("/kagg886/sylu-educational-office-accesser/raw/master-2.0/runtime/broadcast.txt").body?.string()
+        val newAnn = client.execute("/kagg886/sylu-educational-office-accesser/raw/master-3.0/runtime/broadcast.txt").body?.string()
         if (oldAnn == newAnn) {
             _broadcast.value = ""
         } else {

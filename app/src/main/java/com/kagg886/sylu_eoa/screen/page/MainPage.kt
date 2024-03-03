@@ -146,7 +146,7 @@ fun TimeLineTable(data: List<ClassUnit>) {
             lineThickness = 2.dp,
             lineBrush = JetLimeDefaults.lineSolidBrush(color = iconColor),
         ),
-    ) { index, unit, position ->
+    ) { _, unit, position ->
         val type = getTypeInClass(unit)
         JetLimeEvent(
             style = JetLimeEventDefaults.eventStyle(

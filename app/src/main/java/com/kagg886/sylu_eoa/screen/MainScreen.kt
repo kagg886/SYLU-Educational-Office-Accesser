@@ -1,24 +1,26 @@
 package com.kagg886.sylu_eoa.screen
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.core.graphics.drawable.toIcon
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kagg886.sylu_eoa.R
-import com.kagg886.sylu_eoa.util.PageConfig
 import com.kagg886.sylu_eoa.ui.theme.Typography
+import com.kagg886.sylu_eoa.util.PageConfig
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +33,7 @@ fun MainScreen() {
     Scaffold(bottomBar = {
         NavigationBar {
             PageConfig.list.forEach { entry ->
+                val select = entry.router == (reg?.destination?.route ?: PageConfig.DEFAULT_ROUTER)
                 NavigationBarItem(
                     icon = {
                         Icon(painter = painterResource(entry.icon), "")
@@ -38,9 +41,11 @@ fun MainScreen() {
                     label = {
                         Text(entry.title)
                     },
-                    selected = entry.router == (reg?.destination?.route ?: PageConfig.DEFAULT_ROUTER),
+                    selected = select,
                     onClick = {
-                        nav.navigate(entry.router)
+                        if (!select) {
+                            nav.navigate(entry.router)
+                        }
                     },
                     alwaysShowLabel = false
                 )
@@ -53,10 +58,29 @@ fun MainScreen() {
             }
         })
     }) {
+        //enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        //        { fadeIn(animationSpec = tween(700)) },
+        //    exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        //        { fadeOut(animationSpec = tween(700)) },
+        //    popEnterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        //        enterTransition,
+        //    popExitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        //        exitTransition,
         NavHost(
             navController = nav,
             startDestination = PageConfig.DEFAULT_ROUTER,
-            modifier = Modifier.padding(it).fillMaxSize()
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
+
+            enterTransition = {
+                scaleIn(tween(300)) + fadeIn(animationSpec = tween(300))
+//                fadeIn(animationSpec = tween(500))
+            },
+            exitTransition = {
+                scaleOut(tween(300)) + fadeOut(animationSpec = tween(300))
+//                expandIn(tween(500), expandFrom = Alignment.Center)
+            }
         ) {
             PageConfig.list.forEach { entry ->
                 composable(entry.router) {

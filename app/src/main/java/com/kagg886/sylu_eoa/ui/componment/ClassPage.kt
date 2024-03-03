@@ -87,7 +87,11 @@ fun ClassPage(date: LocalDate, list: List<ClassUnit>) {
                 }
             }
         }
-        Row(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        Row(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
             Column {
                 var time = LocalTime.of(8, 0)
                 // 时间列
@@ -190,9 +194,12 @@ fun ClassItem(unit: ClassUnit, height: Int) {
     }
     ClassDialog(onDismiss = { dialog = false }, unit = unit, dialog = dialog)
     Card(
-        modifier = Modifier.height(height = height.dp).padding(3.dp).clickable {
-            dialog = true
-        }, colors = CardDefaults.cardColors(
+        modifier = Modifier
+            .height(height = height.dp)
+            .padding(3.dp)
+            .clickable {
+                dialog = true
+            }, colors = CardDefaults.cardColors(
             containerColor = Color(unit.name.hashCode())
         )
     ) {
@@ -214,8 +221,32 @@ fun Details(k: String, v: String) {
 
 @Composable
 fun ConflictItem(unit: List<ClassUnit>, height: Int) {
+    var dialog by remember {
+        mutableStateOf(false)
+    }
+
+    if (dialog) {
+        AlertDialog(
+            onDismissRequest = { dialog = false }, confirmButton = { },
+            title = {
+                Text(text = "冲突课程查看")
+            }, text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    unit.forEach {
+                        ClassItem(unit = it, height = height)
+                    }
+                }
+            }
+        )
+    }
+
     Card(
-        modifier = Modifier.height(height = height.dp).padding(3.dp), colors = CardDefaults.cardColors(
+        modifier = Modifier
+            .height(height = height.dp)
+            .padding(3.dp)
+            .clickable {
+                dialog = true
+            }, colors = CardDefaults.cardColors(
             containerColor = Color("冲突课程".hashCode())
         )
     ) {

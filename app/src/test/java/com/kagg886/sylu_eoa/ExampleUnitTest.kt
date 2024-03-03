@@ -1,6 +1,7 @@
 package com.kagg886.sylu_eoa
 
 import com.kagg886.sylu_eoa.api.v2.bean.ClassUnit
+import com.kagg886.sylu_eoa.util.DESCrypt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.last
@@ -10,6 +11,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalTime
+import java.util.UUID
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -17,6 +19,13 @@ import java.time.LocalTime
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
+    @Test
+    fun testDES() {
+        val crypt = DESCrypt(UUID.randomUUID().toString())
+
+        println(crypt.encrypt("qwq"))
+    }
+
     @Test
     fun testFlow() = runBlocking {
         val flow = flow {

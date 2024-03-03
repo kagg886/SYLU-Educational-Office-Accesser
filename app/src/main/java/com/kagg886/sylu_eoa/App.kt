@@ -11,11 +11,13 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStore
 import com.kagg886.sylu_eoa.api.v2.util.RSA
 import com.kagg886.sylu_eoa.ui.model.GlobalCrashViewModel
 import com.kagg886.sylu_eoa.util.PreferenceUnit
+import com.kagg886.sylu_eoa.util.newEncryptedPreferenceDataStore
 import com.kagg886.utils.LoggerReceiver
 import com.kagg886.utils.createLogger
 import com.kagg886.utils.registryLogReceiver
@@ -32,10 +34,12 @@ private val scope = CoroutineScope(Dispatchers.IO)
 private val log = createLogger("Application")
 
 class App : Application(), Thread.UncaughtExceptionHandler {
-    private val data by preferencesDataStore("data")
+    private lateinit var data: DataStore<Preferences>;
 
     override fun onCreate() {
         super.onCreate()
+
+        data = newEncryptedPreferenceDataStore("storage", this)
 
         registryLogReceiver(object : LoggerReceiver {
             override fun d(msg: String) {

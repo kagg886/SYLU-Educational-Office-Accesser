@@ -25,8 +25,6 @@ import com.kagg886.sylu_eoa.util.Account
 import com.kagg886.sylu_eoa.util.Password
 import com.kagg886.sylu_eoa.util.Promise
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.lastOrNull
 
 @Composable
 fun LoginScreen() {

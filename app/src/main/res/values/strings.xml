@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">SYLU_EOA</string>
     <string name="app_name_debug">SYLU_EOA_DEBUG</string>
-    <string name="title_activity_setting">SettingActivity</string>
-    <string name="title_activity_about">AboutActivity</string>
 </resources>

@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -23,16 +26,21 @@ import com.kagg886.sylu_eoa.ui.theme.Typography
 import com.kagg886.sylu_eoa.util.PageConfig
 
 
+val LocalNavController = compositionLocalOf<NavHostController> {
+    error("NavController not provided")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+
     val nav = rememberNavController()
 
     val reg by nav.currentBackStackEntryAsState()
 
     Scaffold(bottomBar = {
         NavigationBar {
-            PageConfig.list.forEach { entry ->
+            PageConfig.nav.forEach { entry ->
                 val select = entry.router == (reg?.destination?.route ?: PageConfig.DEFAULT_ROUTER)
                 NavigationBarItem(
                     icon = {
@@ -66,27 +74,30 @@ fun MainScreen() {
         //        enterTransition,
         //    popExitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
         //        exitTransition,
-        NavHost(
-            navController = nav,
-            startDestination = PageConfig.DEFAULT_ROUTER,
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize(),
+        CompositionLocalProvider(LocalNavController provides nav) {
+            NavHost(
+                navController = nav,
+                startDestination = PageConfig.DEFAULT_ROUTER,
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize(),
 
-            enterTransition = {
-                scaleIn(tween(300)) + fadeIn(animationSpec = tween(300))
+                enterTransition = {
+                    scaleIn(tween(300)) + fadeIn(animationSpec = tween(300))
 //                fadeIn(animationSpec = tween(500))
-            },
-            exitTransition = {
-                scaleOut(tween(300)) + fadeOut(animationSpec = tween(300))
+                },
+                exitTransition = {
+                    scaleOut(tween(300)) + fadeOut(animationSpec = tween(300))
 //                expandIn(tween(500), expandFrom = Alignment.Center)
-            }
-        ) {
-            PageConfig.list.forEach { entry ->
-                composable(entry.router) {
-                    entry.widget()
+                }
+            ) {
+                PageConfig.allPage.forEach { entry ->
+                    composable(entry.router) {
+                        entry.widget()
+                    }
                 }
             }
         }
     }
+
 }

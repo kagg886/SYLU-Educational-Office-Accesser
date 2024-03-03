@@ -147,9 +147,11 @@ fun Main() {
         }, title = {
             Text("App遇到了崩溃错误!")
         }, text = {
-            Column(modifier = Modifier
-                .fillMaxHeight(0.7f)
-                .verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight(0.7f)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 Text("详细信息请长按复制以下路径，然后前往文件管理器查看。")
                 SelectionContainer {
                     Text(f, fontWeight = FontWeight.Bold, fontSize = 20.sp)

@@ -27,9 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.kagg886.sylu_eoa.AboutActivity
-import com.kagg886.sylu_eoa.SettingActivity
 import com.kagg886.sylu_eoa.getApp
+import com.kagg886.sylu_eoa.screen.LocalNavController
 import com.kagg886.sylu_eoa.toast
 import com.kagg886.sylu_eoa.ui.componment.Details
 import com.kagg886.sylu_eoa.ui.componment.ErrorPage
@@ -40,7 +39,7 @@ import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
 
 @Composable
 fun MePage() {
-
+    val nav = LocalNavController.current
     val avt = LocalContext.current
     val userModel: SyluUserViewModel = viewModel(viewModelStoreOwner = LocalContext.current as ViewModelStoreOwner)
     val profileModel: ProfileViewModel = viewModel(viewModelStoreOwner = LocalContext.current as ViewModelStoreOwner)
@@ -152,14 +151,14 @@ fun MePage() {
                     }, leadingContent = {
                         Icon(imageVector = Icons.Outlined.Settings, contentDescription = "")
                     }, modifier = Modifier.clickable {
-                        avt.startActivity(Intent(avt, SettingActivity::class.java))
+                        nav.navigate("SettingPage")
                     })
                     ListItem(headlineContent = {
                         Text("关于")
                     }, leadingContent = {
                         Icon(imageVector = Icons.Outlined.Star, contentDescription = "")
                     }, modifier = Modifier.clickable {
-                        avt.startActivity(Intent(avt,AboutActivity::class.java))
+                        nav.navigate("AboutPage")
                     })
                 }
             }
@@ -222,14 +221,14 @@ fun MePage() {
                     }, leadingContent = {
                         Icon(imageVector = Icons.Outlined.Settings, contentDescription = "")
                     }, modifier = Modifier.clickable {
-                        avt.startActivity(Intent(avt, SettingActivity::class.java))
+                        nav.navigate("SettingPage")
                     })
                     ListItem(headlineContent = {
                         Text("关于")
                     }, leadingContent = {
                         Icon(imageVector = Icons.Outlined.Star, contentDescription = "")
                     }, modifier = Modifier.clickable {
-                        avt.startActivity(Intent(avt,AboutActivity::class.java))
+                        nav.navigate("AboutPage")
                     })
                 }
             }

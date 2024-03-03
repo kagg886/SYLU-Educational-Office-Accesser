@@ -50,10 +50,11 @@ class AboutActivity : ComponentActivity() {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Image(
-                                    painter = painterResource(R.drawable.ic_launcher_foreground),
-                                    contentDescription = ""
+                                    painter = painterResource(R.drawable.ic_launcher),
+                                    contentDescription = "",
+                                    modifier = Modifier.padding(30.dp).size(80.dp,80.dp)
                                 )
-                                Text(if (egg < 100) "有你所在的日子，便是奇迹。" else "真的是奇迹欸！你已经点了${egg}下，加油！", modifier = Modifier.padding(top = 30.dp))
+                                Text(if (egg < 100) "有你所在的日子，便是奇迹。" else "真的是奇迹欸！你已经点了${egg}下，加油！", modifier = Modifier.padding(top = 10.dp))
                             }
                         }
                         AboutItem(

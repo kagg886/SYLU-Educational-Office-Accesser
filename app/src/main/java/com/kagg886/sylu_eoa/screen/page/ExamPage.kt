@@ -110,7 +110,10 @@ fun ExamContainer() {
 
                                 LoadingState.FAILED -> {
                                     val err by model.error.collectAsState()
-                                    Text("检测到Cookie过期！\n这大概率是你开启了离线模式。\n请前往设置关闭 '离线模式' 后重新启动。\n详细报错信息：\n${err?.stackTraceToString() ?: "未知错误"}", modifier = Modifier.verticalScroll(rememberScrollState()))
+                                    ErrorPage(ex = err, modifier = Modifier.height(108.dp)) {
+                                        model.clearLoading()
+                                    }
+//                                    Text("检测到Cookie过期！\n这大概率是你开启了离线模式。\n请前往设置关闭 '离线模式' 后重新启动。\n详细报错信息：\n${err?.stackTraceToString() ?: "未知错误"}", modifier = Modifier.verticalScroll(rememberScrollState()))
                                 }
                             }
                         }, title = {

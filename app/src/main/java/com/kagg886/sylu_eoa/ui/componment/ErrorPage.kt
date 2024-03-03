@@ -41,7 +41,7 @@ fun ErrorPage(modifier: Modifier = Modifier, ex: Throwable?, onReloadBtnClick: (
                         )
                     })
             }
-            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth(0.6f)) {
+            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
                 Button(onClick = { dialog = true }) {
                     Text(text = "详细信息")
                 }

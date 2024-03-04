@@ -204,7 +204,10 @@ fun ClassItem(unit: ClassUnit, height: Int) {
         )
     ) {
         Column {
-            Text(unit.name, style = Typography.bodyMedium, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            Text(
+                unit.name, style = Typography.bodyMedium, maxLines = 3, overflow = TextOverflow.Ellipsis,
+                color = if (unit.isDegreeProgram) Color.Red else Color.Unspecified
+            )
             Text(unit.room, style = Typography.bodySmall)
         }
     }

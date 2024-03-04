@@ -21,8 +21,13 @@ data class ClassUnit(
 
     @SerialName("xf") val score: String,
 
-    @SerialName("khfsmc") val classType: String
+    @SerialName("khfsmc") val classType: String,
+
+    @SerialName("zyhxkcbj") private val _degreeProgram: String,
 ) {
+    val isDegreeProgram by lazy {
+        _degreeProgram == "是"
+    }
     //1-2节
     val rangeEveryDay by lazy {
         val ls = lesson.split("-")

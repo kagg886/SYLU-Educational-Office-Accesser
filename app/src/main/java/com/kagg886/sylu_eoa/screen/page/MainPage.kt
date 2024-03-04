@@ -181,7 +181,7 @@ fun TimeLineTable(data: List<ClassUnit>) {
                 )
             ) {
                 Column {
-                    Text(unit.name, style = Typography.bodyLarge, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                    Text(unit.name, style = Typography.bodyLarge, maxLines = 3, overflow = TextOverflow.Ellipsis, color = if (unit.isDegreeProgram) Color.Red else Color.Unspecified)
                     Text(unit.room, style = Typography.bodyMedium)
                     Text(getTime(unit).toString(), style = Typography.bodySmall)
                 }

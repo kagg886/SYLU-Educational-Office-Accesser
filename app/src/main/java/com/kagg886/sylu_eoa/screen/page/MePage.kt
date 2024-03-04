@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
@@ -36,6 +37,7 @@ import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.model.LoadingState
 import com.kagg886.sylu_eoa.ui.model.impl.ProfileViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
+import com.kagg886.sylu_eoa.util.PageItem
 
 @Composable
 fun MePage() {
@@ -112,55 +114,7 @@ fun MePage() {
                     }
                 }
 
-                var exitDialog by remember {
-                    mutableStateOf(false)
-                }
-
-                if (exitDialog) {
-                    AlertDialog(onDismissRequest = {
-                        exitDialog = false
-                    }, confirmButton = {
-                        TextButton(onClick = {
-                            userModel.clearLogin()
-                            getApp().toast("退出登录成功!")
-                        }) {
-                            Text("确定")
-                        }
-                    }, dismissButton = {
-                        TextButton(onClick = {
-                            exitDialog = false
-                        }) {
-                            Text("取消")
-                        }
-                    }, title = {
-                        Text("退出登录")
-                    }, text = {
-                        Text("这么做会清空登录信息并重新登录，确定要这么做吗？")
-                    })
-                }
-                Column(modifier = Modifier.fillMaxWidth(0.9f)) {
-                    ListItem(headlineContent = {
-                        Text("退出登录")
-                    }, leadingContent = {
-                        Icon(imageVector = Icons.AutoMirrored.Outlined.ExitToApp, contentDescription = "")
-                    }, modifier = Modifier.clickable {
-                        exitDialog = true
-                    })
-                    ListItem(headlineContent = {
-                        Text("设置")
-                    }, leadingContent = {
-                        Icon(imageVector = Icons.Outlined.Settings, contentDescription = "")
-                    }, modifier = Modifier.clickable {
-                        nav.navigate("SettingPage")
-                    })
-                    ListItem(headlineContent = {
-                        Text("关于")
-                    }, leadingContent = {
-                        Icon(imageVector = Icons.Outlined.Star, contentDescription = "")
-                    }, modifier = Modifier.clickable {
-                        nav.navigate("AboutPage")
-                    })
-                }
+                PageItem()
             }
         }
 
@@ -180,59 +134,70 @@ fun MePage() {
 
                 HorizontalDivider()
 
-                Column(modifier = Modifier.fillMaxSize(0.9f).weight(0.8f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    var exitDialog by remember {
-                        mutableStateOf(false)
-                    }
-
-                    if (exitDialog) {
-                        AlertDialog(onDismissRequest = {
-                            exitDialog = false
-                        }, confirmButton = {
-                            TextButton(onClick = {
-                                userModel.clearLogin()
-                                getApp().toast("退出登录成功!")
-                            }) {
-                                Text("确定")
-                            }
-                        }, dismissButton = {
-                            TextButton(onClick = {
-                                exitDialog = false
-                            }) {
-                                Text("取消")
-                            }
-                        }, title = {
-                            Text("退出登录")
-                        }, text = {
-                            Text("这么做会清空登录信息并重新登录，确定要这么做吗？")
-                        })
-                    }
-
-
-                    ListItem(headlineContent = {
-                        Text("退出登录")
-                    }, leadingContent = {
-                        Icon(imageVector = Icons.AutoMirrored.Outlined.ExitToApp, contentDescription = "")
-                    }, modifier = Modifier.clickable {
-                        exitDialog = true
-                    })
-                    ListItem(headlineContent = {
-                        Text("设置")
-                    }, leadingContent = {
-                        Icon(imageVector = Icons.Outlined.Settings, contentDescription = "")
-                    }, modifier = Modifier.clickable {
-                        nav.navigate("SettingPage")
-                    })
-                    ListItem(headlineContent = {
-                        Text("关于")
-                    }, leadingContent = {
-                        Icon(imageVector = Icons.Outlined.Star, contentDescription = "")
-                    }, modifier = Modifier.clickable {
-                        nav.navigate("AboutPage")
-                    })
+                Column(modifier = Modifier
+                    .fillMaxSize(0.9f)
+                    .weight(0.8f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    PageItem()
                 }
             }
 
         }
+    }
+}
+@Composable
+private fun PageItem() {
+    val userModel: SyluUserViewModel = viewModel(viewModelStoreOwner = LocalContext.current as ViewModelStoreOwner)
+    val nav = LocalNavController.current
+
+    var exitDialog by remember {
+        mutableStateOf(false)
+    }
+
+    if (exitDialog) {
+        AlertDialog(onDismissRequest = {
+            exitDialog = false
+        }, confirmButton = {
+            TextButton(onClick = {
+                userModel.clearLogin()
+                getApp().toast("退出登录成功!")
+            }) {
+                Text("确定")
+            }
+        }, dismissButton = {
+            TextButton(onClick = {
+                exitDialog = false
+            }) {
+                Text("取消")
+            }
+        }, title = {
+            Text("退出登录")
+        }, text = {
+            Text("这么做会清空登录信息并重新登录，确定要这么做吗？")
+        })
+    }
+    Column(modifier = Modifier.fillMaxWidth(0.9f)) {
+        ListItem(headlineContent = {
+            Text("退出登录")
+        }, leadingContent = {
+            Icon(imageVector = Icons.AutoMirrored.Outlined.ExitToApp, contentDescription = "")
+        }, modifier = Modifier.clickable {
+            exitDialog = true
+        })
+
+        ListItem(headlineContent = {
+            Text("设置")
+        }, leadingContent = {
+            Icon(imageVector = Icons.Outlined.Settings, contentDescription = "")
+        }, modifier = Modifier.clickable {
+            nav.navigate("SettingPage")
+        })
+
+        ListItem(headlineContent = {
+            Text("关于")
+        }, leadingContent = {
+            Icon(imageVector = Icons.Outlined.Star, contentDescription = "")
+        }, modifier = Modifier.clickable {
+            nav.navigate("AboutPage")
+        })
     }
 }

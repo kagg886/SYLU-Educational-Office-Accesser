@@ -32,7 +32,6 @@ import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
 import com.kagg886.sylu_eoa.ui.theme.SYLU_EOATheme
 import com.kagg886.sylu_eoa.util.NightMode
 import com.kagg886.utils.createLogger
-import kotlinx.coroutines.delay
 import okio.IOException
 import kotlin.system.exitProcess
 
@@ -52,7 +51,7 @@ class MainActivity : ComponentActivity() {
             }
 
             LaunchedEffect(key1 = nightMode) {
-                delay(100)
+//                delay(1)
                 isDark = when (nightMode) {
                     2 -> true
                     1 -> false

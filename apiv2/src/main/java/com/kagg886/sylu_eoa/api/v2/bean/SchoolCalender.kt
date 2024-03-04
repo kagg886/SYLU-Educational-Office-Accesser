@@ -40,6 +40,12 @@ object LocalDateTimeAsLongSerializer : KSerializer<LocalDate> {
     }
 
     override fun deserialize(decoder: Decoder): LocalDate {
-        return LocalDate.ofInstant(Instant.ofEpochMilli(decoder.decodeLong()), ZoneOffset.UTC)
+        val instant = Instant.ofEpochMilli(decoder.decodeLong())
+        val offset = ZoneOffset.UTC.rules.getOffset(instant)
+
+        val second = instant.epochSecond + offset.totalSeconds
+        val day = Math.floorDiv(second, 86400)
+        return LocalDate.ofEpochDay(day)
+//        return LocalDate.ofInstant(Instant.ofEpochMilli(decoder.decodeLong()), ZoneOffset.UTC)
     }
 }

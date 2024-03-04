@@ -28,7 +28,10 @@ import com.kagg886.sylu_eoa.ui.model.impl.SchoolCalenderViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
 import com.kagg886.sylu_eoa.ui.theme.Typography
 import com.pushpal.jetlime.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 fun getTips(): Pair<String, String> {
@@ -131,14 +134,30 @@ fun TimeLineTable(data: List<ClassUnit>) {
         Color.Gray
     }
 
-    val dayOfWeek by remember {
-        mutableStateOf(LocalDate.now().dayOfWeek!!)
+
+    //监听时间变化
+    var currentTime by remember { mutableStateOf(LocalDateTime.now()) }
+    LaunchedEffect(key1 = true) {
+        while (isActive) {
+            currentTime = LocalDateTime.now()
+            delay(60000L) // 每一分钟更新一次
+        }
+    }
+    val list by remember(currentTime) {
+        mutableStateOf(ItemsList(data.findClassByWeek(calender!!.currentWeek())
+            .filter { it.dayInWeek.toInt() == currentTime.dayOfWeek.value }))
+    }
+
+    if (list.items.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = "今日无课！可以狠狠睡觉！")
+        }
+        return
     }
 
     JetLimeColumn(
         modifier = Modifier.padding(16.dp),
-        itemsList = ItemsList(data.findClassByWeek(calender!!.currentWeek())
-            .filter { it.dayInWeek.toInt() == dayOfWeek.value }),
+        itemsList = list,
         key = { _, item -> item.hashCode() },
         style = JetLimeDefaults.columnStyle(
             contentDistance = 32.dp,
@@ -147,7 +166,13 @@ fun TimeLineTable(data: List<ClassUnit>) {
             lineBrush = JetLimeDefaults.lineSolidBrush(color = iconColor),
         ),
     ) { _, unit, position ->
-        val type = getTypeInClass(unit)
+        var type by remember {
+            mutableStateOf(getTypeInClass(unit))
+        }
+
+        LaunchedEffect(key1 = currentTime) {
+            type = getTypeInClass(unit,currentTime.toLocalTime())
+        }
         JetLimeEvent(
             style = JetLimeEventDefaults.eventStyle(
                 position = position,

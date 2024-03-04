@@ -1,6 +1,7 @@
 package com.kagg886.sylu_eoa.screen.page
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -128,7 +129,7 @@ fun ExamContainer() {
                 FilterChip(
                     onClick = { filterReGood = !filterReGood },
                     label = {
-                        Text("补", color = Color.Blue)
+                        Text("补", color = if (isSystemInDarkTheme()) Color(0xff84b3ff) else Color.Blue)
                     },
                     selected = filterReGood,
                     leadingIcon = if (filterReGood) {
@@ -232,7 +233,7 @@ fun ExamContainer() {
                         when (it.examStatus) {
                             SUCCESS -> Text("过", color = Color.Green)
                             FAILED -> Text("挂",color = Color.Red)
-                            RE_SUCCESS -> Text("补",color = Color.Blue)
+                            RE_SUCCESS -> Text("补",color = if (isSystemInDarkTheme()) Color(0xff84b3ff) else Color.Blue)
                         }
                     }, modifier = Modifier.clickable {
                         dialog = true

@@ -3,12 +3,9 @@ package com.kagg886.sylu_eoa.screen.page
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +19,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kagg886.sylu_eoa.api.v2.bean.ExamStatus.*
 import com.kagg886.sylu_eoa.api.v2.bean.TERM_ALL_PICKER
 import com.kagg886.sylu_eoa.api.v2.bean.findListByTerm
-import com.kagg886.sylu_eoa.ui.componment.Details
 import com.kagg886.sylu_eoa.ui.componment.ErrorPage
 import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.model.LoadingState
@@ -52,6 +48,20 @@ fun ExamContainer() {
     val err by examViewModel.error.collectAsState()
     val user by userModel.data.collectAsState()
 
+    var filterGood by remember {
+        mutableStateOf(true)
+    }
+    var filterBad by remember {
+        mutableStateOf(true)
+    }
+    var filterReGood by remember {
+        mutableStateOf(true)
+    }
+
+    var filterDegree by remember {
+        mutableStateOf(false)
+    }
+
     when (state) {
         LoadingState.NORMAL -> {
             LaunchedEffect(key1 = Unit) {
@@ -64,15 +74,104 @@ fun ExamContainer() {
         }
 
         LoadingState.SUCCESS -> {
-            val s by remember(picker) {
-                mutableStateOf(data!!.findListByTerm(picker!!))
+            val all by remember(picker) {
+                mutableStateOf(data!!.findListByTerm(picker))
             }
+
+            var s by remember(all) {
+                mutableStateOf(all)
+            }
+
+            LaunchedEffect(s, filterGood, filterBad, filterReGood, filterDegree) { //全部课或仅学位课
+                s = all.filter {
+                    ((it.examStatus == SUCCESS && filterGood) || (it.examStatus == FAILED && filterBad) || (it.examStatus == RE_SUCCESS && filterReGood)) && (it.degreeProgram || !filterDegree)
+                }
+            }
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+                FilterChip(
+                    onClick = { filterGood = !filterGood },
+                    label = {
+                        Text("过", color = Color.Green)
+                    },
+                    selected = filterGood,
+                    leadingIcon = if (filterGood) {
+                        {
+                            Icon(
+                                imageVector = Icons.Outlined.Done,
+                                contentDescription = "Done icon",
+                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                )
+                FilterChip(
+                    onClick = { filterBad = !filterBad },
+                    label = {
+                        Text("挂",color = Color.Red)
+                    },
+                    selected = filterBad,
+                    leadingIcon = if (filterBad) {
+                        {
+                            Icon(
+                                imageVector = Icons.Outlined.Done,
+                                contentDescription = "Done icon",
+                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                )
+                FilterChip(
+                    onClick = { filterReGood = !filterReGood },
+                    label = {
+                        Text("补", color = Color.Blue)
+                    },
+                    selected = filterReGood,
+                    leadingIcon = if (filterReGood) {
+                        {
+                            Icon(
+                                imageVector = Icons.Outlined.Done,
+                                contentDescription = "Done icon",
+                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                )
+                FilterChip(
+                    onClick = { filterDegree = !filterDegree },
+                    label = {
+                        Text(if (filterDegree) "仅学位课" else "全部课")
+                    },
+                    selected = filterDegree,
+                    leadingIcon = if (filterDegree) {
+                        {
+                            Icon(
+                                imageVector = Icons.Outlined.Done,
+                                contentDescription = "Done icon",
+                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                )
+            }
+
+
+
             if (s.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("该学期无考试结果！")
                 }
                 return
             }
+
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(s) {
                     var dialog by remember {
@@ -90,7 +189,7 @@ fun ExamContainer() {
                             when (state) {
                                 LoadingState.NORMAL -> {
                                     LaunchedEffect(key1 = Unit) {
-                                        model.loadDataByUser(user!!,it)
+                                        model.loadDataByUser(user!!, it)
                                     }
                                 }
 
@@ -100,7 +199,7 @@ fun ExamContainer() {
 
                                 LoadingState.SUCCESS -> {
                                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                                        items(data?: listOf()) {
+                                        items(data ?: listOf()) {
                                             ListItem(headlineContent = {
                                                 Text(it[0])
                                             })
@@ -131,9 +230,9 @@ fun ExamContainer() {
                         Text(it.teacher)
                     }, leadingContent = {
                         when (it.examStatus) {
-                            SUCCESS -> Text("过")
-                            FAILED -> Text("挂")
-                            RE_SUCCESS -> Text("补")
+                            SUCCESS -> Text("过", color = Color.Green)
+                            FAILED -> Text("挂",color = Color.Red)
+                            RE_SUCCESS -> Text("补",color = Color.Blue)
                         }
                     }, modifier = Modifier.clickable {
                         dialog = true
@@ -188,9 +287,8 @@ fun PickerContainer() {
                     show = false
                 }) {
                     LazyColumn {
-                        items(
-                            data!!.list.filter { it.asTerm().xnm.isEmpty().not() }.toMutableList()
-                                .also { it.add(0, TERM_ALL_PICKER) }) {
+                        items(data!!.list.filter { it.asTerm().xnm.isEmpty().not() }.toMutableList()
+                            .also { it.add(0, TERM_ALL_PICKER) }) {
                             ListItem(
                                 headlineContent = {
                                     Text(it.toString())
@@ -206,8 +304,7 @@ fun PickerContainer() {
                 }
             }
 
-            Text(
-                current.toString(),
+            Text(current.toString(),
                 style = Typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -215,8 +312,7 @@ fun PickerContainer() {
                     .clickable {
                         show = true
                     }
-                    .padding(top = 10.dp, bottom = 20.dp)
-            )
+                    .padding(top = 10.dp, bottom = 20.dp))
         }
 
         LoadingState.FAILED -> {

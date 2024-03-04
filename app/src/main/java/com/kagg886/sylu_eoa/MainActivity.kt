@@ -23,12 +23,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kagg886.sylu_eoa.screen.LoginScreen
 import com.kagg886.sylu_eoa.screen.MainScreen
 import com.kagg886.sylu_eoa.ui.componment.Loading
+import com.kagg886.sylu_eoa.ui.componment.MaskAnimModel
+import com.kagg886.sylu_eoa.ui.componment.MaskBox
 import com.kagg886.sylu_eoa.ui.model.GlobalCrashViewModel
 import com.kagg886.sylu_eoa.ui.model.LoadingState
 import com.kagg886.sylu_eoa.ui.model.impl.AppOnlineConfigViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
 import com.kagg886.sylu_eoa.ui.theme.SYLU_EOATheme
+import com.kagg886.sylu_eoa.util.NightMode
 import com.kagg886.utils.createLogger
+import kotlinx.coroutines.delay
 import okio.IOException
 import kotlin.system.exitProcess
 
@@ -38,9 +42,42 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SYLU_EOATheme(darkTheme = isSystemInDarkTheme()) {
-                CheckUpdate()
-                Main()
+            //0跟随系统，1为强制日间，2为强制夜间
+            val nightMode by getApp().getConfig(NightMode).collectAsState(0)
+            val isNightSystem = isSystemInDarkTheme()
+
+
+            var isDark by remember { //延迟变换
+                mutableStateOf(false)
+            }
+
+            LaunchedEffect(key1 = nightMode) {
+                delay(100)
+                isDark = when (nightMode) {
+                    2 -> true
+                    1 -> false
+                    0 -> isNightSystem
+                    else -> throw IllegalStateException("bad theme code")
+                }
+            }
+
+            SYLU_EOATheme(
+                darkTheme = isDark
+            ) {
+                MaskBox(
+                    animTime = 1000L,
+                    maskComplete = {
+                    },
+                    animFinish = {},
+                ) { emit ->
+                    //非延迟变换
+                    LaunchedEffect(key1 = nightMode) {
+                        emit(MaskAnimModel.EXPEND, 0F, 0F)
+                    }
+                    CheckUpdate()
+                    Main()
+                }
+
             }
         }
     }

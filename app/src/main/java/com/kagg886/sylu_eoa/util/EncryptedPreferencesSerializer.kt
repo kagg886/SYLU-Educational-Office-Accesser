@@ -52,15 +52,7 @@ class EncryptedPreferencesSerializer(password: String) : Serializer<Preferences>
         val mutablePreferences = mutablePreferencesOf()
 
         preferencesProto.preferencesMap.forEach { (name, value) ->
-            if (value.hasString()) {
-                addProtoEntryToPreferences(
-                    name,
-                    Value.newBuilder().setString(desCrypt.decrypt(value.string)).build(),
-                    mutablePreferences
-                )
-            } else {
-                addProtoEntryToPreferences(name, value, mutablePreferences)
-            }
+            addProtoEntryToPreferences(name, value, mutablePreferences)
         }
 
         return mutablePreferences.toPreferences()
@@ -108,7 +100,7 @@ class EncryptedPreferencesSerializer(password: String) : Serializer<Preferences>
             Value.ValueCase.DOUBLE -> mutablePreferences[doublePreferencesKey(name)] = value.double
             Value.ValueCase.INTEGER -> mutablePreferences[intPreferencesKey(name)] = value.integer
             Value.ValueCase.LONG -> mutablePreferences[longPreferencesKey(name)] = value.long
-            Value.ValueCase.STRING -> mutablePreferences[stringPreferencesKey(name)] = value.string
+            Value.ValueCase.STRING -> mutablePreferences[stringPreferencesKey(name)] = desCrypt.decrypt(value.string)
             Value.ValueCase.STRING_SET -> mutablePreferences[stringSetPreferencesKey(name)] =
                 value.stringSet.stringsList.toSet()
 

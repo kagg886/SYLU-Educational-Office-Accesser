@@ -1,35 +1,33 @@
 package com.kagg886.sylu_eoa.screen.page
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat.finishAffinity
 import com.alorma.compose.settings.storage.base.rememberBooleanSettingState
 import com.alorma.compose.settings.storage.base.rememberIntSettingState
-import com.alorma.compose.settings.ui.SettingsGroup
-import com.alorma.compose.settings.ui.SettingsMenuLink
-import com.alorma.compose.settings.ui.SettingsSlider
-import com.alorma.compose.settings.ui.SettingsSwitch
+import com.alorma.compose.settings.ui.*
 import com.kagg886.sylu_eoa.currentActivity
 import com.kagg886.sylu_eoa.getApp
 import com.kagg886.sylu_eoa.toast
-import com.kagg886.sylu_eoa.ui.theme.SYLU_EOATheme
 import com.kagg886.sylu_eoa.ui.theme.Typography
 import com.kagg886.sylu_eoa.util.*
 
 private val app by lazy {
     getApp()
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun SettingPage() {
     val _storePass by app.getConfig(StorePassword).collectAsState(false)
@@ -51,19 +49,19 @@ fun SettingPage() {
         expire.value = _expire
     }
 
-    Column(modifier = Modifier
-        .verticalScroll(rememberScrollState())) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
         SettingsGroup(title = {
             Text("登录")
         }) {
-            Column(modifier = Modifier.height(75.dp)) {
-                SettingsSwitch(title = {
-                    Text("记住密码")
-                }, subtitle = {
-                    Text("登录检验失败时自动使用密码登录")
-                }, state = storePass) {
-                    app.updateConfig(StorePassword, it)
-                }
+            SettingsSwitch(title = {
+                Text("记住密码")
+            }, subtitle = {
+                Text("登录检验失败时自动使用密码登录")
+            }, state = storePass, modifier = Modifier.height(75.dp)) {
+                app.updateConfig(StorePassword, it)
             }
 
             SettingsSwitch(title = {
@@ -128,6 +126,30 @@ fun SettingPage() {
                 Text("所有的数据都以该id进行加密存储。\n请不要担心，设备id由app的安装时间加工得来，与您的敏感信息没有关系")
             }) {
                 uuidDialog = true
+            }
+        }
+
+        val _night by app.getConfig(NightMode).collectAsState(0)
+
+        val night = rememberIntSettingState(0)
+
+        LaunchedEffect(key1 = _night) {
+            night.value = _night
+        }
+        SettingsGroup(title = {
+            Text(text = "外观")
+        }) {
+            SettingsListDropdown(
+                title = {
+                    Text(text = "日夜模式")
+                },
+                items = listOf("跟随系统", "日间模式", "夜间模式"),
+                state = night,
+                modifier = Modifier.height(75.dp),
+                onItemSelected = { set, _ ->
+                    app.updateConfig(NightMode, set)
+                }) { _, string ->
+                Text(text = string)
             }
         }
 
@@ -227,4 +249,10 @@ fun SettingPage() {
             restoreSettingDialog = true
         }
     }
+}
+
+@Preview
+@Composable
+fun SettingPagePreview() {
+    SettingPage()
 }

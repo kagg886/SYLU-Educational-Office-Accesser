@@ -1,6 +1,7 @@
 package com.kagg886.sylu_eoa
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -9,13 +10,16 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.kagg886.sylu_eoa.api.v2.util.RSA
-import com.kagg886.sylu_eoa.ui.model.GlobalCrashViewModel
 import com.kagg886.sylu_eoa.util.PreferenceUnit
 import com.kagg886.sylu_eoa.util.newEncryptedPreferenceDataStore
 import com.kagg886.utils.LoggerReceiver
@@ -28,6 +32,7 @@ import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
 import java.time.LocalDateTime
+import kotlin.system.exitProcess
 
 
 private val scope = CoroutineScope(Dispatchers.IO)
@@ -119,7 +124,83 @@ class App : Application(), Thread.UncaughtExceptionHandler {
                 it.write(buf, 0, len)
             }
         }
-        GlobalCrashViewModel.setCrashData(e, file)
+        //    if (crash) {
+        //        AlertDialog(onDismissRequest = {
+        //            exitProcess(1)
+        //        }, confirmButton = {
+        //            Button(onClick = {
+        //                exitProcess(1)
+        //            }) {
+        //                Text("退出程序")
+        //            }
+        //        }, title = {
+        //            Text("App遇到了崩溃错误!")
+        //        }, text = {
+        //            Column(
+        //                modifier = Modifier
+        //                    .fillMaxHeight(0.7f)
+        //                    .verticalScroll(rememberScrollState())
+        //            ) {
+        //                Text("详细信息请长按复制以下路径，然后前往文件管理器查看。")
+        //                SelectionContainer {
+        //                    Text(f, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        //                }
+        //
+        //                var showCrash by remember {
+        //                    mutableStateOf(false)
+        //                }
+        //                TextButton(onClick = { showCrash = !showCrash }) {
+        //                    Text("点我显示高级调试信息(反馈问题时务必使用长截图或录屏)", fontSize = 9.sp)
+        //                }
+        //                if (showCrash) {
+        //                    Text(crashData!!.stackTraceToString())
+        //                }
+        //
+        //            }
+        //        })
+        //    }
+        scope.launch {
+            val ctx = currentActivity()
+            withContext(Dispatchers.Main) {
+                AlertDialog.Builder(ctx)
+                    .setOnCancelListener {
+                        exitProcess(1)
+                    }
+                    .setTitle("app即将崩溃(ｷ｀ﾟДﾟ´)!!")
+                    .setView(LinearLayout(ctx).apply {
+                        orientation = LinearLayout.VERTICAL
+                        addView(TextView(ctx).apply {
+                            text = "请复制下面的路径，转到文件管理器查看错误信息"
+                        })
+                        addView(TextView(ctx).apply {
+                            setTextIsSelectable(true)
+                            text = file.absolutePath
+                        })
+
+                        val txt = ScrollView(ctx).apply {
+                            addView(TextView(ctx).apply {
+                                text = e.stackTraceToString()
+                            })
+                        }
+                        var isOpen = false
+                        val handleOpen = {
+                            addView(txt)
+                        }
+
+                        val handleClose = {
+                            removeView(txt)
+                        }
+                        addView(Button(ctx).apply {
+                            text = "点我显示高级调试信息(反馈问题时务必使用长截图或录屏)"
+                            setOnClickListener {
+                                isOpen = !isOpen
+                                if (isOpen) handleOpen() else handleClose()
+                            }
+                        })
+                    })
+                    .show()
+            }
+        }
     }
 
 

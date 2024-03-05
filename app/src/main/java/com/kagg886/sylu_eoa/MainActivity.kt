@@ -4,20 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kagg886.sylu_eoa.screen.LoginScreen
@@ -25,7 +16,6 @@ import com.kagg886.sylu_eoa.screen.MainScreen
 import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.componment.MaskAnimModel
 import com.kagg886.sylu_eoa.ui.componment.MaskBox
-import com.kagg886.sylu_eoa.ui.model.GlobalCrashViewModel
 import com.kagg886.sylu_eoa.ui.model.LoadingState
 import com.kagg886.sylu_eoa.ui.model.impl.AppOnlineConfigViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
@@ -33,7 +23,6 @@ import com.kagg886.sylu_eoa.ui.theme.SYLU_EOATheme
 import com.kagg886.sylu_eoa.util.NightMode
 import com.kagg886.utils.createLogger
 import okio.IOException
-import kotlin.system.exitProcess
 
 private val log = createLogger("MainActivity")
 
@@ -166,46 +155,6 @@ fun Main() {
 
     val loading by syluUserViewModel.loading.collectAsState()
     val err by syluUserViewModel.error.collectAsState()
-
-    val crashData by GlobalCrashViewModel.crash.collectAsState()
-    val crash by GlobalCrashViewModel.crashed.collectAsState()
-    val f by GlobalCrashViewModel.file.collectAsState()
-
-    if (crash) {
-        AlertDialog(onDismissRequest = {
-            exitProcess(1)
-        }, confirmButton = {
-            Button(onClick = {
-                exitProcess(1)
-            }) {
-                Text("退出程序")
-            }
-        }, title = {
-            Text("App遇到了崩溃错误!")
-        }, text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight(0.7f)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Text("详细信息请长按复制以下路径，然后前往文件管理器查看。")
-                SelectionContainer {
-                    Text(f, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                }
-
-                var showCrash by remember {
-                    mutableStateOf(false)
-                }
-                TextButton(onClick = { showCrash = !showCrash }) {
-                    Text("点我显示高级调试信息(反馈问题时务必使用长截图或录屏)", fontSize = 9.sp)
-                }
-                if (showCrash) {
-                    Text(crashData!!.stackTraceToString())
-                }
-
-            }
-        })
-    }
 
     when (loading) {
         //开始加载

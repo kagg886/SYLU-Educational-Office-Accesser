@@ -5,10 +5,15 @@ import android.graphics.*
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -19,9 +24,13 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsMenuLink
+import com.kagg886.sylu_eoa.api.v2.bean.GPAScore
 import com.kagg886.sylu_eoa.getApp
 import com.kagg886.sylu_eoa.toast
+import com.kagg886.sylu_eoa.ui.componment.ErrorPage
+import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.model.LoadingState
+import com.kagg886.sylu_eoa.ui.model.impl.GPAViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.ProfileViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
 import com.kagg886.sylu_eoa.ui.theme.Typography
@@ -38,12 +47,95 @@ fun ToolPage() {
     SettingsGroup(title = {
         Column {
             Text(text = "在线工具")
-            Text(text = "强烈建议关闭离线模式正常使用", style = Typography.titleMedium)
+            Text(text = "强烈建议关闭离线模式使用", style = Typography.titleMedium)
         }
     }) {
         HorizontalDivider()
         ImageSigner()
+        HorizontalDivider()
+        BigInnovation()
     }
+}
+
+@Composable
+private fun BigInnovation() {
+    val userModel: SyluUserViewModel = viewModel(viewModelStoreOwner = LocalContext.current as ViewModelStoreOwner)
+    val user by userModel.data.collectAsState()
+    var dialog by remember {
+        mutableStateOf(false)
+    }
+
+    val gpaViewModel:GPAViewModel = viewModel()
+
+    val state by gpaViewModel.loading.collectAsState()
+    val gpa by gpaViewModel.data.collectAsState()
+
+    if (dialog) {
+        AlertDialog(onDismissRequest = { dialog = false }, confirmButton = {},
+            title = { Text(text = "大创学分详情") }, text = {
+                when(state) {
+                    LoadingState.NORMAL -> {
+                        gpaViewModel.loadData()
+                    }
+                    LoadingState.LOADING -> {
+                        Loading(fullScreen = false)
+                    }
+                    LoadingState.SUCCESS -> {
+                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                            items(gpa!!.keys.toList()) {
+                                var expand by remember {
+                                    mutableStateOf(false)
+                                }
+                                Row {
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    Column {
+                                        ListItem(headlineContent = { Text(text = it) }, trailingContent = {
+                                            Icon(
+                                                imageVector = if (expand) Icons.Outlined.KeyboardArrowDown else Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                                                contentDescription = ""
+                                            )
+                                        }, modifier = Modifier.clickable { expand = !expand })
+                                        if (expand) {
+                                            LazyColumn(modifier = Modifier.height((75*gpa!![it]!!.size).dp)) {
+                                                items(gpa!![it]!!) {
+                                                    ListItem(headlineContent = { Text(text = it.name) }, supportingContent = {
+                                                        Text(text = it.score)
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    LoadingState.FAILED -> {
+                        val err by gpaViewModel.error.collectAsState()
+                        if (err?.message == "need web") {
+                            LaunchedEffect(key1 = Unit) {
+                                gpaViewModel.fetchUser(user!!)
+                            }
+                            Loading()
+                            return@AlertDialog
+                        }
+                        ErrorPage(ex = err) {
+                            gpaViewModel.clearLoading()
+                        }
+                    }
+                }
+            })
+    }
+
+    SettingsMenuLink(title = {
+        Text(text = "大创学分")
+    }, subtitle = {
+        Text(text = "查看你获得的大创学分")
+    }, modifier = Modifier.height(75.dp), icon = {
+        Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = "")
+    }) {
+        dialog = true
+    }
+
 }
 
 @Composable

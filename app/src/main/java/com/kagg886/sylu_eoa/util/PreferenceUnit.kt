@@ -36,3 +36,7 @@ object PickerBeanExpire : PreferenceUnit<Long>(longPreferencesKey("picker-expire
 
 object ProfileBean : PreferenceUnit<String>(stringPreferencesKey("profile"), "")
 object ProfileBeanExpire : PreferenceUnit<Long>(longPreferencesKey("profile-expire"), -1)
+
+
+object GPABean : PreferenceUnit<String>(stringPreferencesKey("gpa"), "")
+object GPABeanExpire : PreferenceUnit<Long>(longPreferencesKey("gpa-expire"), -1)

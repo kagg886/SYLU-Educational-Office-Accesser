@@ -11,6 +11,8 @@ open class PreferenceUnit<T>(
 object Announcement : PreferenceUnit<String>(stringPreferencesKey("announcement"), "")
 object NightMode : PreferenceUnit<Int>(intPreferencesKey("nightMode"), 0)
 
+object ReadAboutOnFirst : PreferenceUnit<Boolean>(booleanPreferencesKey("readAboutOnFirst"), false)
+
 object Account : PreferenceUnit<String>(stringPreferencesKey("account"), "")
 object Password : PreferenceUnit<String>(stringPreferencesKey("password"), "")
 object StorePassword : PreferenceUnit<Boolean>(booleanPreferencesKey("store-password"), false)

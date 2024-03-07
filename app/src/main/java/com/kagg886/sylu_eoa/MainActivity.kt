@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kagg886.sylu_eoa.screen.LoginScreen
 import com.kagg886.sylu_eoa.screen.MainScreen
+import com.kagg886.sylu_eoa.screen.page.AboutPage
 import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.componment.MaskAnimModel
 import com.kagg886.sylu_eoa.ui.componment.MaskBox
@@ -21,7 +23,9 @@ import com.kagg886.sylu_eoa.ui.model.impl.AppOnlineConfigViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
 import com.kagg886.sylu_eoa.ui.theme.SYLU_EOATheme
 import com.kagg886.sylu_eoa.util.NightMode
+import com.kagg886.sylu_eoa.util.ReadAboutOnFirst
 import com.kagg886.utils.createLogger
+import kotlinx.coroutines.flow.first
 import okio.IOException
 
 private val log = createLogger("MainActivity")
@@ -47,6 +51,31 @@ class MainActivity : ComponentActivity() {
                     0 -> isNightSystem
                     else -> throw IllegalStateException("bad theme code")
                 }
+            }
+
+
+            var s: Boolean by remember {
+                mutableStateOf(true)
+            };
+
+            LaunchedEffect(key1 = Unit) {
+                s = getApp().getConfig(ReadAboutOnFirst).first()
+            }
+
+            if (!s) {
+                AlertDialog(onDismissRequest = {
+                    s = true
+                    getApp().updateConfig(ReadAboutOnFirst,true)
+                }, confirmButton = {
+                    Button(onClick = {
+                        s = true
+                        getApp().updateConfig(ReadAboutOnFirst,true)
+                    }) {
+                        Text(text = "已读")
+                    }
+                }, text = {
+                    AboutPage()
+                })
             }
 
             SYLU_EOATheme(

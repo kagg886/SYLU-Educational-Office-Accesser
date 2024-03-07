@@ -1,15 +1,12 @@
 package com.kagg886.sylu_eoa.screen.page
 
-import android.content.Intent
 import android.graphics.BitmapFactory
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
@@ -37,7 +34,6 @@ import com.kagg886.sylu_eoa.ui.componment.Loading
 import com.kagg886.sylu_eoa.ui.model.LoadingState
 import com.kagg886.sylu_eoa.ui.model.impl.ProfileViewModel
 import com.kagg886.sylu_eoa.ui.model.impl.SyluUserViewModel
-import com.kagg886.sylu_eoa.util.PageItem
 
 @Composable
 fun MePage() {
@@ -182,6 +178,14 @@ private fun PageItem() {
             Icon(imageVector = Icons.AutoMirrored.Outlined.ExitToApp, contentDescription = "")
         }, modifier = Modifier.clickable {
             exitDialog = true
+        })
+
+        ListItem(headlineContent = {
+            Text("工具")
+        }, leadingContent = {
+            Icon(imageVector = Icons.Outlined.Build, contentDescription = "")
+        }, modifier = Modifier.clickable {
+            nav.navigate("ToolPage")
         })
 
         ListItem(headlineContent = {

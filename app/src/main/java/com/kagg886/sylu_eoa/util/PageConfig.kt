@@ -14,6 +14,7 @@ object PageConfig {
 
     val allPage: List<PageItem> = mutableListOf<PageItem>().apply {
         addAll(nav)
+        add(PageItem("工具", 0, "ToolPage") @Composable { ToolPage() })
         add(PageItem("设置", 0, "SettingPage") @Composable { SettingPage() })
         add(PageItem("关于", 0, "AboutPage") @Composable { AboutPage() })
     }

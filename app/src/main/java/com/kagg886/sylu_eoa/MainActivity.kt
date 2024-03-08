@@ -65,11 +65,11 @@ class MainActivity : ComponentActivity() {
             if (!s) {
                 AlertDialog(onDismissRequest = {
                     s = true
-                    getApp().updateConfig(ReadAboutOnFirst,true)
+                    getApp().updateConfig(ReadAboutOnFirst, true)
                 }, confirmButton = {
                     Button(onClick = {
                         s = true
-                        getApp().updateConfig(ReadAboutOnFirst,true)
+                        getApp().updateConfig(ReadAboutOnFirst, true)
                     }) {
                         Text(text = "已读")
                     }
@@ -89,7 +89,8 @@ class MainActivity : ComponentActivity() {
                 ) { emit ->
                     //非延迟变换
                     LaunchedEffect(key1 = nightMode) {
-                        emit(MaskAnimModel.EXPEND, 0F, 0F)
+                        val d = getApp().resources.displayMetrics
+                        emit(MaskAnimModel.EXPEND, d.widthPixels.toFloat() / 2, d.heightPixels.toFloat() / 2)
                     }
                     CheckUpdate()
                     Main()

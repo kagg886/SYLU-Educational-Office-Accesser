@@ -17,3 +17,4 @@ rootProject.name = "SYLU_EOA"
 include(":app")
 include(":apiv2")
 include(":utils")
+include(":apiTW")

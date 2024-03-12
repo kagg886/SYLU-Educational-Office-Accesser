@@ -19,11 +19,11 @@ import javax.xml.crypto.Data
 private val log = createLogger("SyluUser")
 
 class SyluUser(
-    private val user: String,
-    private val serializer: CookieSerializer = InMemoryCookieSerializer,
+    val user: String,
+    val serializer: CookieSerializer = InMemoryCookieSerializer,
     baseURL:String = "https://jxw.sylu.edu.cn",
 ) {
-    private val client: NetWorkClient = NetWorkClient(baseURL, serializer)
+    internal val client: NetWorkClient = NetWorkClient(baseURL, serializer)
 
     private var password: String? = null
 
@@ -238,11 +238,6 @@ class SyluUser(
         }.asJSONBean<List<GPAScore>> {
             this.jsonObject["items"]!!
         }
-    }
-
-    //登录区
-    fun getUser(): String {
-        return user
     }
 
     fun getPassword(): String? {

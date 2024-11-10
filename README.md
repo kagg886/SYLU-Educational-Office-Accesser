@@ -1,5 +1,6 @@
 # SYLU-EOA(V3)
 
+> 请前往[Gitee仓库](https://gitee.com/kagg886/sylu-educational-office-accesser)查看V4(Compose版本)的SYLU_EOA
 
 ## 1. 概述
 
